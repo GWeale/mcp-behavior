@@ -1,0 +1,52 @@
+name: MCP Behavior
+description: Verify MCP tool results and declared effects against expectations or a baseline.
+author: George Weale
+
+branding:
+  icon: check-square
+  color: blue
+
+inputs:
+  contract:
+    description: Path to the MCP Behavior YAML contract.
+    required: true
+  evidence:
+    description: Directory for deterministic evidence.
+    required: false
+    default: .mcp-behavior/evidence
+  report:
+    description: Path for the JUnit report.
+    required: false
+    default: .mcp-behavior/report.xml
+  version:
+    description: MCP Behavior package version to install.
+    required: false
+    default: 0.1.0
+  python-version:
+    description: Python version used by the action.
+    required: false
+    default: "3.13"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install MCP Behavior
+      shell: bash
+      env:
+        MCP_BEHAVIOR_VERSION: ${{ inputs.version }}
+      run: python -m pip install "mcp-behavior==${MCP_BEHAVIOR_VERSION}"
+    - name: Verify behavior
+      shell: bash
+      env:
+        MCP_BEHAVIOR_CONTRACT: ${{ inputs.contract }}
+        MCP_BEHAVIOR_EVIDENCE: ${{ inputs.evidence }}
+        MCP_BEHAVIOR_REPORT: ${{ inputs.report }}
+      run: >-
+        mcp-behavior verify "$MCP_BEHAVIOR_CONTRACT"
+        --evidence "$MCP_BEHAVIOR_EVIDENCE"
+        --format junit
+        --output "$MCP_BEHAVIOR_REPORT"

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 420" role="img" aria-labelledby="title desc">
+  <title id="title">MCP Behavior terminal output</title>
+  <desc id="desc">A terminal report with a diverging lookup scenario and a matching file effect</desc>
+  <rect width="940" height="420" rx="18" fill="#0b1220"/>
+  <rect x="1" y="1" width="938" height="418" rx="17" fill="none" stroke="#263349" stroke-width="2"/>
+  <circle cx="30" cy="29" r="7" fill="#fb7185"/>
+  <circle cx="54" cy="29" r="7" fill="#fbbf24"/>
+  <circle cx="78" cy="29" r="7" fill="#4ade80"/>
+  <path d="M0 57h940" stroke="#263349" stroke-width="2"/>
+  <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="20">
+    <text x="28" y="94" fill="#94a3b8">$ mcp-behavior diff mcp-behavior.yaml</text>
+    <text x="28" y="137" fill="#e2e8f0">MCP Behavior: </text>
+    <text x="196" y="137" fill="#fb7185">DIVERGE</text>
+    <text x="28" y="171" fill="#94a3b8">mode: differential</text>
+    <text x="28" y="205" fill="#94a3b8">digest: 4b7d...c291</text>
+    <text x="28" y="255" fill="#fb7185">DIVERGE</text>
+    <text x="172" y="255" fill="#e2e8f0">lookup response stays compatible</text>
+    <text x="52" y="291" fill="#fb7185">DIVERGE</text>
+    <text x="196" y="291" fill="#cbd5e1">call known user (lookup)</text>
+    <text x="76" y="327" fill="#fda4af">$.structuredContent.status: missing from candidate</text>
+    <text x="28" y="371" fill="#5eead4">MATCH</text>
+    <text x="172" y="371" fill="#e2e8f0">receipt file effect</text>
+  </g>
+</svg>

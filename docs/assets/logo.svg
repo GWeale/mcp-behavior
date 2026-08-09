@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">MCP Behavior logo</title>
+  <desc id="desc">Two offset observation frames joined by a comparison line</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#152238"/>
+      <stop offset="1" stop-color="#0a1020"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset="1" stop-color="#60a5fa"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <rect x="24" y="28" width="48" height="48" rx="10" fill="none" stroke="#94a3b8" stroke-width="6"/>
+  <rect x="56" y="52" width="48" height="48" rx="10" fill="none" stroke="url(#accent)" stroke-width="6"/>
+  <path d="M40 92h16M72 36h16" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+  <path d="M45 61l10 10 26-28" fill="none" stroke="#5eead4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

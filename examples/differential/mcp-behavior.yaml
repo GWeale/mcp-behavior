@@ -1,0 +1,24 @@
+version: 1
+name: differential-example
+
+targets:
+  reference:
+    transport: stdio
+    command: [python, reference_server.py]
+    workspace: reference-workspace
+  candidate:
+    transport: stdio
+    command: [python, candidate_server.py]
+    workspace: candidate-workspace
+
+scenarios:
+  - name: lookup response stays compatible
+    tags: [migration]
+    calls:
+      - name: known user
+        tool: lookup
+        arguments:
+          user_id: user-42
+        normalize:
+          ignore:
+            - $._meta['io.modelcontextprotocol/serverInfo']

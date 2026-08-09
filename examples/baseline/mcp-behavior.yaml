@@ -1,0 +1,21 @@
+version: 1
+name: baseline-example
+baseline: baseline.json
+
+targets:
+  candidate:
+    transport: stdio
+    command: [python, server.py]
+    workspace: .
+
+scenarios:
+  - name: calculate tax
+    tags: [pricing]
+    calls:
+      - name: california example
+        tool: price
+        arguments:
+          subtotal: 20
+          tax_rate: 0.0725
+        compare:
+          numeric_tolerance: 0.001

@@ -1,0 +1,49 @@
+version: 1
+name: expectations-example
+
+targets:
+  candidate:
+    transport: stdio
+    command: [python, server.py]
+    workspace: .
+
+scenarios:
+  - name: echo preserves the message
+    tags: [smoke]
+    calls:
+      - name: echo hello
+        tool: echo
+        arguments:
+          message: hello
+        expect:
+          outcome: success
+          paths_equal:
+            $.structuredContent.message: hello
+
+  - name: saving a receipt writes the file
+    tags: [effects]
+    setup:
+      - command: [python, -c, "from pathlib import Path; Path('receipt.txt').unlink(missing_ok=True)"]
+    calls:
+      - name: save receipt
+        tool: save_receipt
+        arguments:
+          total: 12.5
+        expect:
+          outcome: success
+          paths_equal:
+            $.structuredContent.saved: true
+    observers:
+      - name: receipt file
+        kind: file
+        root: .
+        path: receipt.txt
+        phase: delta
+        expect:
+          contains:
+            change: created
+            after:
+              state: present
+              text: "total=12.50\n"
+    cleanup:
+      - command: [python, -c, "from pathlib import Path; Path('receipt.txt').unlink(missing_ok=True)"]

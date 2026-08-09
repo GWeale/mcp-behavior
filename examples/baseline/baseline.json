@@ -1,0 +1,38 @@
+{
+  "contract_name": "baseline-example",
+  "scenarios": [
+    {
+      "calls": [
+        {
+          "is_error": false,
+          "name": "california example",
+          "tool": "price",
+          "value": {
+            "_meta": {
+              "io.modelcontextprotocol/serverInfo": {
+                "name": "baseline-example",
+                "version": ""
+              }
+            },
+            "content": [
+              {
+                "text": "{\n  \"subtotal\": 20.0,\n  \"tax\": 1.45\n}",
+                "type": "text"
+              }
+            ],
+            "isError": false,
+            "resultType": "complete",
+            "structuredContent": {
+              "subtotal": 20.0,
+              "tax": 1.45
+            }
+          }
+        }
+      ],
+      "effects": [],
+      "name": "calculate tax"
+    }
+  ],
+  "schema_version": 1,
+  "semantic_digest": "769def63eca265f1d6b49698ffafefd6cef746aab73dd1a55c8e7ff11501e30a"
+}

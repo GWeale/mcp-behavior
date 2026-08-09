@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose one observable behavior or workflow improvement.
+title: "[feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the regression-testing case that is hard today.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Small contract example
+      description: Show the YAML you would want to write, with private values removed.
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Product-boundary check
+      description: Explain why this belongs in executed behavior testing rather than protocol conformance or schema checking.

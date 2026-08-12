@@ -16,7 +16,7 @@ The product boundary was informed by public behavior-testing concepts and these 
 
 The [positioning note](POSITIONING.md) records where this project begins and where those tools remain the better fit.
 
-The logo, social preview, and terminal demo are original repository-native SVG assets. The PNG social preview is a rasterization of the tracked SVG.
+The terminal demo is an original repository-native SVG asset. The current logo direction was selected from project-specific concepts made with OpenAI image generation, then independently reconstructed as tracked SVG paths for this repository. Its raster assets and social preview are rendered from those tracked vectors; no third-party branding was used.
 
 ## Project name
 

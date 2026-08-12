@@ -44,13 +44,14 @@ The reviewed alpha is public as [`GWeale/mcp-behavior`](https://github.com/GWeal
 - Public installation: isolated `pipx` and `uvx` installs from the GitHub URL expose the documented CLI.
 - Public examples: all five suites pass from a fresh public clone with their documented exit codes.
 - Composite Action: a separate private consumer repository passed `GWeale/mcp-behavior@main` and uploaded its evidence and JUnit report.
+- Brand system: selected signal-and-endpoint identity reconstructed as light/dark SVGs, transparent raster sizes, favicon assets, and a revised social preview.
 
 ## Known risks
 
 - v0.1.0 is an alpha. Contract, baseline, and evidence schema compatibility begins with the first published release.
 - Local servers, lifecycle commands, and custom probes are trusted code. Timeouts and containment are not a hostile-code sandbox.
 - Windows can occasionally delay a child MCP process long enough to produce the intentionally conservative `INCONCLUSIVE` verdict; repeated public-source runs and the full CI matrix pass.
-- The social preview image is committed at `docs/assets/social-preview.png`; GitHub does not expose a public REST endpoint for assigning it to repository settings.
+- The revised social preview image is committed at `docs/assets/social-preview.png`; GitHub does not expose a public REST endpoint for assigning it to repository settings.
 
 ## Next actions
 

@@ -85,7 +85,7 @@ This ledger maps the v0.1.0 release requirements to code, public artifacts, and 
 | Clean package smoke | built wheel installed in a temporary environment; all five suites and repeatability check run from that install |
 | Public repository files | README, Apache-2.0, changelog, roadmap, security/contribution/conduct files, issue forms, PR template, label catalog |
 | Contributor entry points | eight scoped drafts in [CONTRIBUTOR_ISSUES.md](CONTRIBUTOR_ISSUES.md), including four `good first issue` drafts |
-| Visual assets | original SVG logo/demo and 1280×640 social preview; rendered demo and preview inspected locally |
+| Visual assets | tracked light/dark SVG logo variants, raster sizes, original terminal demo, and 1280×640 social preview; provenance recorded in [PROVENANCE.md](PROVENANCE.md) |
 
 ## Publication boundary
 

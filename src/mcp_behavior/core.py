@@ -317,11 +317,21 @@ async def _execute_target_scenario(
         async with connect_target(target, contract) as active_connection:
             connected = active_connection
             for call in scenario.calls:
-                calls[call.name] = await connected.call_tool(call.tool, call.arguments)
+                call_started = time.perf_counter()
+                observation = await connected.call_tool(call.tool, call.arguments)
+                calls[call.name] = Observation(
+                    observation.value,
+                    observation.is_error,
+                    {
+                        **observation.metadata,
+                        "duration_ms": round((time.perf_counter() - call_started) * 1000),
+                    },
+                )
         _collect_connection(connected, log_parts, secrets)
         connected = None
 
         for observer in scenario.observers:
+            observer_started = time.perf_counter()
             capture = await capture_observer(
                 observer,
                 contract,
@@ -330,10 +340,18 @@ async def _execute_target_scenario(
                 workspace=target.workspace,
             )
             _collect_effect(capture, log_parts, secrets, f"observer {observer.name} after")
-            effects[observer.name] = (
+            observation = (
                 make_delta(before[observer.name], capture.observation)
                 if observer.phase == "delta"
                 else capture.observation
+            )
+            effects[observer.name] = Observation(
+                observation.value,
+                observation.is_error,
+                {
+                    **observation.metadata,
+                    "duration_ms": round((time.perf_counter() - observer_started) * 1000),
+                },
             )
     except (ExecutionError, TargetError, OSError, ValueError) as exc:
         if connected is not None:
@@ -395,7 +413,7 @@ def _evaluate_call(
         is_effect=False,
     )
     assert isinstance(result, CallReport)
-    return result
+    return replace(result, arguments=_sanitize_value(spec.arguments, secrets))
 
 
 def _evaluate_effect(
@@ -497,6 +515,7 @@ def _evaluate_observation(
             differences=differences,
             candidate=safe_candidate,
             reference=safe_reference,
+            duration_ms=_duration(candidate),
         )
     return CallReport(
         name=name,
@@ -505,7 +524,15 @@ def _evaluate_observation(
         differences=differences,
         candidate=safe_candidate,
         reference=safe_reference,
+        duration_ms=_duration(candidate),
     )
+
+
+def _duration(observation: Observation | None) -> int:
+    if observation is None:
+        return 0
+    value = observation.metadata.get("duration_ms")
+    return int(value) if isinstance(value, int) and not isinstance(value, bool) else 0
 
 
 def _baseline_scenario(scenario: ScenarioSpec, run: _TargetRun) -> JsonValue:

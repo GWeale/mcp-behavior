@@ -60,6 +60,13 @@ def write_evidence(
         "scenario_durations_ms": {
             scenario.name: scenario.duration_ms for scenario in report.scenarios
         },
+        "observation_durations_ms": {
+            scenario.name: {
+                "calls": {call.name: call.duration_ms for call in scenario.calls},
+                "effects": {effect.name: effect.duration_ms for effect in scenario.effects},
+            }
+            for scenario in report.scenarios
+        },
     }
     _write_json(root / "manifest.json", manifest)
     _write_json(root / "run.json", run)
@@ -74,8 +81,12 @@ def write_evidence(
                 {
                     "name": call.name,
                     "tool": call.tool,
+                    "request": call.arguments,
+                    "request_sha256": _value_digest(call.arguments),
                     "candidate": call.candidate,
                     "reference": call.reference,
+                    "candidate_sha256": _value_digest(call.candidate),
+                    "reference_sha256": _value_digest(call.reference),
                 }
                 for call in scenario.calls
             ]
@@ -83,6 +94,7 @@ def write_evidence(
         comparisons = {
             "verdict": scenario.verdict,
             "error": scenario.error,
+            "semantic_digest": semantic_digest(_scenario_semantic(scenario)),
             "calls": [
                 {
                     "name": call.name,
@@ -93,7 +105,19 @@ def write_evidence(
             ],
         }
         effects = {
-            "effects": [asdict(effect) for effect in scenario.effects],
+            "effects": [
+                {
+                    "name": effect.name,
+                    "kind": effect.kind,
+                    "verdict": effect.verdict,
+                    "differences": [asdict(item) for item in effect.differences],
+                    "candidate": effect.candidate,
+                    "reference": effect.reference,
+                    "candidate_sha256": _value_digest(effect.candidate),
+                    "reference_sha256": _value_digest(effect.reference),
+                }
+                for effect in scenario.effects
+            ],
         }
         _write_json(scenario_root / "observation.json", observations)
         _write_json(scenario_root / "comparison.json", comparisons)
@@ -144,6 +168,7 @@ def _scenario_semantic(scenario: ScenarioReport) -> JsonValue:
             {
                 "name": call.name,
                 "tool": call.tool,
+                "arguments": call.arguments,
                 "verdict": call.verdict,
                 "differences": [asdict(item) for item in call.differences],
                 "candidate": call.candidate,
@@ -151,7 +176,17 @@ def _scenario_semantic(scenario: ScenarioReport) -> JsonValue:
             }
             for call in scenario.calls
         ],
-        "effects": [asdict(effect) for effect in scenario.effects],
+        "effects": [
+            {
+                "name": effect.name,
+                "kind": effect.kind,
+                "verdict": effect.verdict,
+                "differences": [asdict(item) for item in effect.differences],
+                "candidate": effect.candidate,
+                "reference": effect.reference,
+            }
+            for effect in scenario.effects
+        ],
     }
 
 
@@ -187,6 +222,10 @@ def _write_json(path: Path, value: Any) -> None:
 def _slug(value: str) -> str:
     slug = "".join(character.lower() if character.isalnum() else "-" for character in value)
     return "-".join(part for part in slug.split("-") if part)[:64] or "scenario"
+
+
+def _value_digest(value: JsonValue) -> str | None:
+    return semantic_digest(value) if value is not None else None
 
 
 def _as_json_object(value: dict[str, Any]) -> dict[str, JsonValue]:

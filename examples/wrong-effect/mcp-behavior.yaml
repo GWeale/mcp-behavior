@@ -1,0 +1,48 @@
+version: 1
+name: wrong-effect-example
+
+variables:
+  invoice_id: inv-42
+  expected_total: 100
+
+targets:
+  candidate:
+    transport: stdio
+    command: [python, server.py]
+    workspace: .
+
+scenarios:
+  - name: success response must match the written invoice
+    tags: [effects, regression]
+    setup:
+      - command: [python, -c, "from pathlib import Path; Path('invoice.json').unlink(missing_ok=True)"]
+    calls:
+      - name: export invoice
+        tool: export_invoice
+        arguments:
+          invoice_id: ${invoice_id}
+          total: ${expected_total}
+        normalize:
+          ignore:
+            - $.content
+            - $._meta['io.modelcontextprotocol/serverInfo']
+        expect:
+          outcome: success
+          paths_equal:
+            $.structuredContent.saved: true
+            $.structuredContent.invoice_id: ${invoice_id}
+    observers:
+      - name: invoice file
+        kind: file
+        root: .
+        path: invoice.json
+        phase: delta
+        expect:
+          contains:
+            change: created
+            after:
+              state: present
+              encoding: utf-8
+              text: "{\"invoice_id\":\"inv-42\",\"total\":100}\n"
+    cleanup:
+      - command: [python, -c, "from pathlib import Path; Path('invoice.json').unlink(missing_ok=True)"]

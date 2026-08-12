@@ -1,0 +1,42 @@
+- name: bug
+  color: d73a4a
+  description: Confirmed incorrect behavior
+- name: enhancement
+  color: a2eeef
+  description: New behavior with an agreed scope
+- name: good first issue
+  color: 7057ff
+  description: Bounded work with a documented test seam
+- name: documentation
+  color: 0075ca
+  description: Public documentation or examples
+- name: tests
+  color: 1d76db
+  description: Observable regression or compatibility coverage
+- name: effects
+  color: 0e8a16
+  description: File, tree, database, or custom probe observation
+- name: reliability
+  color: b60205
+  description: Timeouts, cleanup, determinism, or uncertainty handling
+- name: security
+  color: ee0701
+  description: Security boundary, credential handling, or isolation
+- name: design
+  color: c5def5
+  description: Decision required before implementation
+- name: cross-platform
+  color: f9d0c4
+  description: Windows, macOS, or Linux behavior
+- name: api
+  color: d4c5f9
+  description: Python or extension interface
+- name: http
+  color: fbca04
+  description: Streamable HTTP target behavior
+- name: examples
+  color: 5319e7
+  description: Runnable public scenarios
+- name: prototype
+  color: ededed
+  description: Evidence-gathering code that is not production behavior

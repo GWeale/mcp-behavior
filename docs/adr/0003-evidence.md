@@ -12,7 +12,9 @@ Write a versioned manifest and per-scenario files with canonical JSON: UTF-8, so
 
 Separate semantic evidence from volatile run metadata. The semantic digest excludes timestamps, durations, absolute temporary paths, and other explicitly volatile fields. A repeated deterministic run must therefore have the same semantic digest even if diagnostic timing differs.
 
-Raw MCP values may be retained only after recursive redaction and output-size enforcement. Authorization headers and environment values are never serialized. Normalization rules and every ignored path are included in evidence so omitted differences remain reviewable.
+Raw MCP values remain in memory only while normalization and sanitization run. Persistent evidence and public report models receive the normalized, sanitized values. Authorization headers and resolved environment values are never serialized.
+
+Normalization rules remain explicit in the reviewed contract. `run.json` records the contract path used for an execution. Per-observation value hashes and a per-scenario semantic hash make persisted values easy to identify without allowing durations into the semantic manifest.
 
 ## Directory shape
 

@@ -83,6 +83,15 @@ def test_sanitizer_redacts_sensitive_keys_and_known_values() -> None:
     }
 
 
+def test_sanitizer_redacts_common_token_shapes_in_unstructured_text() -> None:
+    github = "gh" + "p_abcdefghijklmnopqrstuvwxyz123456"
+    aws = "AK" + "IAABCDEFGHIJKLMNOP"
+    slack = "xo" + "xb-1234567890-abcdefghijklmnop"
+    value = {"message": f"github {github} aws {aws} slack {slack}"}
+
+    assert sanitize(value) == {"message": "github <redacted> aws <redacted> slack <redacted>"}
+
+
 def test_observation_size_limit_fails_closed() -> None:
     enforce_serialized_limit({"ok": "small"}, 100)
     with pytest.raises(ObservationLimitError, match="configured limit"):
@@ -104,6 +113,29 @@ def test_comparison_supports_tolerance_and_declared_unordered_lists() -> None:
     )
     differences = compare_values(reference, candidate, ComparisonSpec())
     assert differences[0].path == "$.items[0].id"
+
+
+def test_exact_text_and_bytes_comparisons_have_distinct_semantics() -> None:
+    exact = compare_values(1, 1.0, ComparisonSpec(kind="exact"))
+    assert exact[0].message == "exact values differ"
+
+    text = compare_values(
+        {"encoding": "utf-8", "text": "first\nold\n"},
+        {"encoding": "utf-8", "text": "first\nnew\n"},
+        ComparisonSpec(kind="text"),
+    )
+    assert text[0].path == "$[line:2]"
+    assert text[0].reference == "old"
+    assert text[0].candidate == "new"
+
+    binary = compare_values(
+        {"encoding": "base64", "data": "AAEC"},
+        {"encoding": "base64", "data": "AAED"},
+        ComparisonSpec(kind="bytes"),
+    )
+    assert binary[0].path == "$[byte:2]"
+    assert binary[0].reference == "02"
+    assert binary[0].candidate == "03"
 
 
 def test_assertions_cover_outcome_subset_paths_and_absence() -> None:

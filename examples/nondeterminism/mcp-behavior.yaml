@@ -1,0 +1,41 @@
+version: 1
+name: nondeterminism-example
+
+timeouts:
+  connect: 10
+  operation: 5
+  total: 30
+
+targets:
+  candidate:
+    transport: stdio
+    command: [python, server.py]
+    workspace: .
+
+scenarios:
+  - name: declared runtime noise normalizes
+    tags: [normalization]
+    calls:
+      - name: runtime snapshot
+        tool: snapshot
+        normalize:
+          ignore:
+            - $.content
+            - $._meta['io.modelcontextprotocol/serverInfo']
+          builtins: [timestamps, uuids, request_ids, ports, temp_paths]
+        expect:
+          outcome: success
+          paths_equal:
+            $.structuredContent.generated_at: <timestamp>
+            $.structuredContent.run_uuid: <uuid>
+            $.structuredContent.request_id: <request-id>
+            $.structuredContent.callback: http://127.0.0.1:<port>/result
+            $.structuredContent.temp_path: <temp-path>
+
+  - name: abrupt server exit is inconclusive
+    tags: [reliability]
+    calls:
+      - name: abort connection
+        tool: abort_connection
+        expect:
+          outcome: success

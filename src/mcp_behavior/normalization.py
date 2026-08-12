@@ -19,6 +19,9 @@ _PATH_TOKEN = re.compile(
 _SECRET_KEY = re.compile(r"(?:authorization|api[_-]?key|token|secret|password|credential)", re.I)
 _BEARER = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
 _OPENAI_KEY = re.compile(r"\bsk-[A-Za-z0-9_-]{12,}\b")
+_GITHUB_TOKEN = re.compile(r"\bgh[pousr]_[A-Za-z0-9]{30,}\b")
+_AWS_ACCESS_KEY = re.compile(r"\bAKIA[0-9A-Z]{16}\b")
+_SLACK_TOKEN = re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{20,}\b")
 _ISO_TIMESTAMP = re.compile(
     r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?$"
 )
@@ -187,6 +190,9 @@ def sanitize(value: JsonValue, known_secrets: Iterable[str] = ()) -> JsonValue:
         if isinstance(item, str):
             text = _BEARER.sub("Bearer <redacted>", item)
             text = _OPENAI_KEY.sub("<redacted>", text)
+            text = _GITHUB_TOKEN.sub("<redacted>", text)
+            text = _AWS_ACCESS_KEY.sub("<redacted>", text)
+            text = _SLACK_TOKEN.sub("<redacted>", text)
             for secret in secrets:
                 text = text.replace(secret, "<redacted>")
             return text

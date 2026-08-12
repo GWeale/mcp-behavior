@@ -33,6 +33,8 @@ jobs:
 
 The action installs the pinned release specified by its `version` input, runs verification, writes JUnit, and leaves evidence for later upload. It does not upload artifacts on its own.
 
+The repository CI matrix runs Python 3.11 through 3.14 on Ubuntu, macOS, and Windows. Its package job builds the wheel and source archive, verifies their metadata and provenance, installs the wheel in a fresh environment, and runs all five public examples with their documented exit codes.
+
 ## Direct CLI
 
 For projects that already manage Python, install the package in the job and call the CLI directly. `--name` can be repeated for exact scenarios. `--tag` can be repeated and matches any listed tag.
@@ -43,3 +45,5 @@ mcp-behavior verify mcp-behavior.yaml \
   --format json \
   --output .mcp-behavior/report.json
 ```
+
+Use `--diff-detail full` for a complete human report. JSON and JUnit always retain the complete difference set.

@@ -32,7 +32,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -54,6 +54,7 @@ jobs:
       - run: uv sync --all-groups --locked
       - run: uv run python -m build
       - run: uv run python scripts/verify_dist.py dist
+      - run: uv run python scripts/smoke_dist.py dist --quiet
       - uses: actions/upload-artifact@v7
         with:
           name: distributions

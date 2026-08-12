@@ -18,8 +18,10 @@ For repository identity, settings, topics, and launch-page checks, follow the [G
 2. Run `uv sync --all-groups --locked`.
 3. Run `uv run python scripts/release_gate.py`.
 4. Inspect `dist/SHA256SUMS`, wheel metadata, source archive contents, and the rendered README.
-5. Install the wheel into a fresh Python 3.11 virtual environment and run `mcp-behavior --version` plus the expectations example.
+5. Run `scripts/smoke_dist.py` to install the wheel into a fresh environment and execute every public example with its documented exit code.
 6. Confirm the working tree is clean and CI passes on the candidate commit.
+
+Before a new Python version is added to the supported matrix, run the clean-wheel smoke with `--python X.Y` and add that version to CI and package classifiers in the same reviewed change.
 
 ## Publish
 

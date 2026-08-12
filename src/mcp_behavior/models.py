@@ -56,6 +56,7 @@ class CallReport:
     name: str
     tool: str
     verdict: Verdict
+    arguments: JsonValue = None
     differences: tuple[Difference, ...] = ()
     candidate: JsonValue = None
     reference: JsonValue = None
@@ -70,6 +71,7 @@ class EffectReport:
     differences: tuple[Difference, ...] = ()
     candidate: JsonValue = None
     reference: JsonValue = None
+    duration_ms: int = 0
 
 
 @dataclass(frozen=True, slots=True)

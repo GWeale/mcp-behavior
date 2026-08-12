@@ -12,8 +12,8 @@ targets:
     workspace: candidate-workspace
 
 scenarios:
-  - name: lookup response stays compatible
-    tags: [migration]
+  - name: schema-compatible lookup value stays stable
+    tags: [migration, value-drift]
     calls:
       - name: known user
         tool: lookup
@@ -21,4 +21,5 @@ scenarios:
           user_id: user-42
         normalize:
           ignore:
+            - $.content
             - $._meta['io.modelcontextprotocol/serverInfo']

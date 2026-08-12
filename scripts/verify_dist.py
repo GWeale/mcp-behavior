@@ -9,12 +9,30 @@ import zipfile
 from collections.abc import Iterable
 from pathlib import Path, PurePosixPath
 
+from audit_release import SECRET_PATTERNS
+
 REQUIRED_WHEEL_FILES = {
     "mcp_behavior/__init__.py",
     "mcp_behavior/cli.py",
     "mcp_behavior/core.py",
     "mcp_behavior/py.typed",
 }
+REQUIRED_SDIST_FILES = {
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "README.md",
+    "ROADMAP.md",
+    "SECURITY.md",
+    "docs/ARCHITECTURE.md",
+    "docs/CONTRACT.md",
+    "docs/EVIDENCE.md",
+    "docs/PROVENANCE.md",
+    "examples/differential/mcp-behavior.yaml",
+    "examples/nondeterminism/mcp-behavior.yaml",
+    "examples/wrong-effect/mcp-behavior.yaml",
+}
+FORBIDDEN_SDIST_FILES = {"AGENTS.md", "CONTEXT.md", "STATUS.md"}
 FORBIDDEN_TERMS = ("st" + "rust", "google" + "-internal", "private" + "-adk")
 
 
@@ -55,10 +73,23 @@ def _verify_wheel(path: Path) -> None:
 def _verify_sdist(path: Path) -> None:
     with tarfile.open(path, "r:gz") as archive:
         members = archive.getmembers()
+        relative_names: set[str] = set()
         for member in members:
             pure = PurePosixPath(member.name)
             if pure.is_absolute() or ".." in pure.parts:
                 raise SystemExit(f"unsafe source archive member: {member.name}")
+            relative = PurePosixPath(*pure.parts[1:]).as_posix()
+            relative_names.add(relative)
+            if _credential_member(relative):
+                raise SystemExit(f"credential-like source archive member: {relative}")
+        missing = REQUIRED_SDIST_FILES - relative_names
+        forbidden = FORBIDDEN_SDIST_FILES & relative_names
+        if missing:
+            raise SystemExit(f"source archive is missing: {', '.join(sorted(missing))}")
+        if forbidden:
+            raise SystemExit(
+                f"source archive contains internal files: {', '.join(sorted(forbidden))}"
+            )
         text_members = []
         for member in members:
             if member.isfile() and member.size <= 2_000_000:
@@ -74,6 +105,14 @@ def _scan_text_members(members: Iterable[tuple[str, bytes]]) -> None:
         for term in FORBIDDEN_TERMS:
             if term in text:
                 raise SystemExit(f"forbidden private-project term {term!r} found in {name}")
+        for label, pattern in SECRET_PATTERNS.items():
+            if pattern.search(data):
+                raise SystemExit(f"possible {label} found in {name}")
+
+
+def _credential_member(name: str) -> bool:
+    path = PurePosixPath(name.lower())
+    return path.name == ".env" or path.suffix in {".env", ".key", ".p12", ".pfx", ".pem"}
 
 
 def _sha256(path: Path) -> str:

@@ -8,6 +8,7 @@ MCP Behavior reads strict YAML. Unknown keys, duplicate mapping keys, YAML alias
 |---|---:|---|
 | `version` | yes | Contract schema version. The current value is `1`. |
 | `name` | no | Evidence and baseline identity. Defaults to the filename stem. |
+| `variables` | no | Non-secret JSON literals used by `${name}` scenario substitution. |
 | `targets` | yes | A `candidate` and optional `reference`. |
 | `scenarios` | yes | Ordered named scenarios. |
 | `baseline` | no | JSON baseline path, relative to the contract. |
@@ -15,6 +16,28 @@ MCP Behavior reads strict YAML. Unknown keys, duplicate mapping keys, YAML alias
 | `limits` | no | `output_bytes` and `log_bytes`. |
 
 The presence of `reference` selects differential mode. Otherwise `baseline` selects baseline mode. A contract with neither uses expectations mode and requires `expect` on every call and observer.
+
+## Scenario variables
+
+Top-level variables reduce repeated non-secret literals:
+
+```yaml
+variables:
+  item_id: item-42
+  quantity: 3
+
+scenarios:
+  - name: lookup ${item_id}
+    calls:
+      - tool: lookup
+        arguments:
+          id: ${item_id}
+          quantity: ${quantity}
+```
+
+An exact `${name}` value preserves the variable's JSON type. Embedded references interpolate scalar values into a string. Mapping keys are never substituted. Unknown variables, invalid names, and structured values embedded inside a larger string fail during contract loading.
+
+Variables cannot resolve environment values and sensitive-looking variable names are rejected. Put credentials in target or command `from_env` references so the sanitizer can register them before execution.
 
 ## Targets
 
@@ -49,6 +72,8 @@ targets:
 ```
 
 Sensitive-looking environment variables and headers must use `from_env`. Resolved values stay in memory and are registered with the evidence sanitizer. `mode` accepts `auto`, `modern`, or `legacy`. Modern mode requires protocol version `2026-07-28`; legacy forces the SDK's legacy client mode.
+
+HTTP URLs cannot contain userinfo credentials or credential-like query fields. Redirects are not followed because the redirected host was not explicitly configured as an MCP target.
 
 ## Scenarios and lifecycle
 
@@ -95,6 +120,19 @@ calls:
 
 `outcome` is `success` by default and can be set to `error`. Assertions can compare the full value with `equals`, require a recursive subset with `contains`, check exact values at paths, or require paths to be absent.
 
+Comparison kinds have distinct behavior:
+
+| Kind | Behavior |
+|---|---|
+| `json` | structural JSON diff, numeric tolerance, declared unordered arrays |
+| `exact` | root type and value must match exactly |
+| `text` | strings or UTF-8 file observations, reported by changed line region |
+| `bytes` | UTF-8/base64 file observations, reported at the first changed byte |
+
+`numeric_tolerance` and `unordered` are valid only for `json`. `--diff-detail first` shortens human output; complete differences remain in evidence and machine reports.
+
+See [normalization](NORMALIZATION.md) for rule order and path syntax.
+
 ## Observers
 
 File, tree, and SQLite observers resolve relative roots against the target workspace.
@@ -126,3 +164,5 @@ A custom observer receives one JSON value on stdin and must write one JSON value
 ```
 
 Use `phase: after` for one snapshot. Use `phase: delta` to receive `change` (`created`, `deleted`, `modified`, or `unchanged`) plus the `before` and `after` values.
+
+The full observer protocol and containment rules are documented in [observable effects](EFFECTS.md).

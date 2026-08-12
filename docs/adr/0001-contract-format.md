@@ -22,8 +22,10 @@ Best expresses the nested, ordered scenario model and supports comments. It adds
 
 ## Decision
 
-Use a small versioned YAML subset parsed with `yaml.safe_load`. Reject aliases, custom tags, duplicate keys, unknown keys, and ambiguous scalar shapes. Validation errors identify the source file and semantic field path; YAML syntax errors include line and column.
+Use a small versioned YAML subset parsed with a hardened safe loader. Reject aliases, custom tags, duplicate keys, unknown keys, unsupported JSON paths, and ambiguous scalar shapes. Validation errors identify the source file and semantic field path; YAML syntax errors include line and column.
+
+Allow `${name}` substitution only from top-level literal JSON variables. Do not resolve environment variables through this mechanism. Credential-bearing target and command values use `from_env`, which registers the resolved value with the sanitizer without adding it to the contract.
 
 ## Consequences
 
-The contract is pleasant to author, while the compiler—not callers—owns defaults, path resolution, environment references, and strictness. JSON may later be accepted as a YAML subset without a second public model.
+The compiler owns defaults, path resolution, literal substitution, environment references, and strictness. JSON may later be accepted as a YAML subset without a second public model.

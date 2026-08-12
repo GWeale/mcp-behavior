@@ -1,5 +1,6 @@
 """MCP Behavior public package."""
 
+from .contract import TargetSpec, ValueSource
 from .core import record, record_async, verify, verify_async
 from .models import (
     CallReport,
@@ -15,6 +16,8 @@ __all__ = [
     "Difference",
     "EffectReport",
     "ScenarioReport",
+    "TargetSpec",
+    "ValueSource",
     "Verdict",
     "VerificationReport",
     "record",

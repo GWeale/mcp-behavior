@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
 import copy
+import difflib
 import math
 from typing import Any
 
@@ -44,6 +47,22 @@ def compare_values(
             ),
         )
 
+    if spec.kind == "exact":
+        if type(reference) is type(candidate) and reference == candidate:
+            return ()
+        return (
+            Difference(
+                path="$",
+                message="exact values differ",
+                reference=reference,
+                candidate=candidate,
+            ),
+        )
+    if spec.kind == "text":
+        return _compare_text(reference, candidate)
+    if spec.kind == "bytes":
+        return _compare_bytes(reference, candidate)
+
     left = copy.deepcopy(reference)
     right = copy.deepcopy(candidate)
     for path in spec.unordered:
@@ -53,6 +72,104 @@ def compare_values(
     differences: list[Difference] = []
     _diff(left, right, "$", differences, spec.numeric_tolerance)
     return tuple(differences)
+
+
+def _compare_text(reference: JsonValue, candidate: JsonValue) -> tuple[Difference, ...]:
+    left = _text_value(reference)
+    right = _text_value(candidate)
+    if left is None or right is None:
+        return (
+            Difference(
+                path="$",
+                message=(
+                    "text comparison requires strings or UTF-8 file observations "
+                    "with encoding and text fields"
+                ),
+                reference=reference,
+                candidate=candidate,
+            ),
+        )
+    if left == right:
+        return ()
+    differences: list[Difference] = []
+    matcher = difflib.SequenceMatcher(a=left.splitlines(), b=right.splitlines(), autojunk=False)
+    for operation, left_start, left_end, right_start, right_end in matcher.get_opcodes():
+        if operation == "equal":
+            continue
+        line = min(left_start, right_start) + 1
+        differences.append(
+            Difference(
+                path=f"$[line:{line}]",
+                message=f"text lines {operation}",
+                reference="\n".join(left.splitlines()[left_start:left_end]),
+                candidate="\n".join(right.splitlines()[right_start:right_end]),
+            )
+        )
+    return tuple(differences)
+
+
+def _compare_bytes(reference: JsonValue, candidate: JsonValue) -> tuple[Difference, ...]:
+    left = _bytes_value(reference)
+    right = _bytes_value(candidate)
+    if left is None or right is None:
+        return (
+            Difference(
+                path="$",
+                message=(
+                    "bytes comparison requires a file observation with encoding plus data/text"
+                ),
+                reference=reference,
+                candidate=candidate,
+            ),
+        )
+    if left == right:
+        return ()
+    shared = min(len(left), len(right))
+    offset = next((index for index in range(shared) if left[index] != right[index]), shared)
+    if offset == shared and len(left) != len(right):
+        message = f"byte length changed from {len(left)} to {len(right)}"
+    else:
+        message = f"bytes differ at offset {offset}"
+    return (
+        Difference(
+            path=f"$[byte:{offset}]",
+            message=message,
+            reference=left[offset : offset + 16].hex(),
+            candidate=right[offset : offset + 16].hex(),
+        ),
+    )
+
+
+def _text_value(value: JsonValue) -> str | None:
+    if isinstance(value, str):
+        return value
+    if (
+        isinstance(value, dict)
+        and value.get("encoding") == "utf-8"
+        and isinstance(value.get("text"), str)
+    ):
+        text = value["text"]
+        assert isinstance(text, str)
+        return text
+    return None
+
+
+def _bytes_value(value: JsonValue) -> bytes | None:
+    if not isinstance(value, dict):
+        return None
+    encoding = value.get("encoding")
+    if encoding == "utf-8" and isinstance(value.get("text"), str):
+        text = value["text"]
+        assert isinstance(text, str)
+        return text.encode("utf-8")
+    if encoding == "base64" and isinstance(value.get("data"), str):
+        data = value["data"]
+        assert isinstance(data, str)
+        try:
+            return base64.b64decode(data, validate=True)
+        except (binascii.Error, ValueError):
+            return None
+    return None
 
 
 def assert_observation(

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
+import time
 from pathlib import Path
 
 from mcp.server.mcpserver import MCPServer
@@ -32,6 +33,14 @@ def write_note(content: str) -> dict[str, object]:
 
 
 @server.tool(structured_output=True)
+def delete_note() -> dict[str, bool]:
+    path = Path("note.txt")
+    existed = path.exists()
+    path.unlink(missing_ok=True)
+    return {"deleted": existed}
+
+
+@server.tool(structured_output=True)
 def reveal_fixture_secret() -> dict[str, object]:
     """Return a test-only secret so persistence redaction can be verified."""
 
@@ -43,6 +52,14 @@ def expected_failure() -> dict[str, object]:
     """Raise a stable error for expected-error assertions."""
 
     raise ValueError("fixture failure")
+
+
+@server.tool(structured_output=True)
+def slow(seconds: float) -> dict[str, bool]:
+    """Sleep long enough to exercise the client's operation timeout."""
+
+    time.sleep(seconds)
+    return {"completed": True}
 
 
 if __name__ == "__main__":

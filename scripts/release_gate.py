@@ -18,6 +18,7 @@ def main() -> int:
         ["uv", "run", "ruff", "check", "."],
         ["uv", "run", "mypy"],
         ["uv", "run", "python", "scripts/check_docs.py"],
+        ["uv", "run", "python", "scripts/audit_release.py"],
         [
             "uv",
             "run",
@@ -29,7 +30,7 @@ def main() -> int:
         ["uv", "run", "pip-audit"],
         ["uv", "run", "python", "-m", "build", "--outdir", str(dist)],
         ["uv", "run", "python", "scripts/verify_dist.py", str(dist)],
-        ["uv", "run", "mcp-behavior", "--version"],
+        ["uv", "run", "python", "scripts/smoke_dist.py", str(dist), "--quiet"],
     ]
     for command in commands:
         print(f"+ {' '.join(command)}", flush=True)

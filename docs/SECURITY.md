@@ -13,11 +13,16 @@ MCP Behavior runs developer-selected MCP servers and commands. It assumes that c
 - SQLite observers open databases read-only, enable `query_only`, accept `SELECT` or `WITH`, and cap rows.
 - Sensitive environment and header values are resolved at runtime and sanitized before persistence.
 - Cleanup runs after partial scenario execution.
+- The runtime makes network requests only to MCP target URLs declared in the loaded contract.
+- Streamable HTTP redirects are not followed.
+- Telemetry, analytics, update checks, and model calls are absent.
 
 ## Outside the boundary
 
 These controls are not a sandbox. Trusted code can read any file and access any network resource allowed to the current process. Absolute observer roots are also allowed because some integration tests need them.
 
 Use an OS sandbox, container, VM, or restricted CI runner for code you do not trust. Scope credentials to the test account and give the process only the permissions the scenario needs.
+
+Package installation and the repository's development/release tooling may contact package indexes, GitHub, or PyPI. That tooling is separate from a normal `mcp-behavior verify` run.
 
 Report a vulnerability through GitHub's private security advisory flow. Do not open a public issue containing credentials, exploit details, or private evidence.

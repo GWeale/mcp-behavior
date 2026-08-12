@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import sqlite3
 import sys
+import time
 from contextlib import closing
 from pathlib import Path
 
@@ -68,3 +69,30 @@ def test_command_output_limit_is_shared_across_streams(tmp_path: Path) -> None:
                 log_limit=50,
             )
         )
+
+
+def test_command_timeout_kills_descendant_processes(tmp_path: Path) -> None:
+    marker = tmp_path / "descendant-survived.txt"
+    child = (
+        "import time; from pathlib import Path; time.sleep(0.6); "
+        f"Path({str(marker)!r}).write_text('survived')"
+    )
+    parent = (
+        "import subprocess,sys,time; "
+        f"subprocess.Popen([sys.executable, '-c', {child!r}]); time.sleep(10)"
+    )
+    spec = CommandSpec((sys.executable, "-c", parent), None)
+
+    with pytest.raises(ExecutionError, match="timed out"):
+        asyncio.run(
+            run_command(
+                spec,
+                source=tmp_path / "contract.yaml",
+                label="process-tree fixture",
+                workspace=tmp_path,
+                default_timeout=0.2,
+                log_limit=1000,
+            )
+        )
+    time.sleep(0.8)
+    assert not marker.exists()

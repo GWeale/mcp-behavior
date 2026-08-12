@@ -2,22 +2,28 @@
 
 from __future__ import annotations
 
+import copy
+import json
 import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qsl, urlsplit
 
 import yaml
 from yaml.constructor import ConstructorError
 from yaml.nodes import MappingNode
 
 from .models import AssertionSpec, ComparisonSpec, JsonValue, NormalizationSpec
+from .normalization import JsonPathError, parse_json_path
 
 _SENSITIVE_NAME = re.compile(
     r"(?:authorization|api[_-]?key|token|secret|password|credential)", re.I
 )
 _BUILTINS = {"timestamps", "uuids", "temp_paths", "ports", "request_ids"}
+_VARIABLE_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+_VARIABLE_REFERENCE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
 
 class ContractError(ValueError):
@@ -171,6 +177,7 @@ class Contract:
     scenarios: tuple[ScenarioSpec, ...]
     timeouts: Timeouts
     limits: Limits
+    variables: dict[str, JsonValue] = field(default_factory=dict)
     baseline: Path | None = None
     version: int = 1
 
@@ -194,7 +201,16 @@ def load_contract(path: str | Path, *, allow_unasserted: bool = False) -> Contra
     data = _mapping(document, source, "$")
     _unknown(
         data,
-        {"version", "name", "targets", "scenarios", "timeouts", "limits", "baseline"},
+        {
+            "version",
+            "name",
+            "variables",
+            "targets",
+            "scenarios",
+            "timeouts",
+            "limits",
+            "baseline",
+        },
         source,
         "$",
     )
@@ -203,6 +219,7 @@ def load_contract(path: str | Path, *, allow_unasserted: bool = False) -> Contra
         raise ContractError(source, "$.version", f"unsupported contract version {version!r}")
     name = _string(data.get("name", source.stem), source, "$.name")
     base = source.parent
+    variables = _variables(data.get("variables", {}), source)
     targets_data = _mapping(data.get("targets"), source, "$.targets")
     if "candidate" not in targets_data:
         raise ContractError(source, "$.targets", "a candidate target is required")
@@ -215,7 +232,12 @@ def load_contract(path: str | Path, *, allow_unasserted: bool = False) -> Contra
     if not scenarios_raw:
         raise ContractError(source, "$.scenarios", "at least one scenario is required")
     scenarios = tuple(
-        _scenario(item, source, base, f"$.scenarios[{index}]")
+        _scenario(
+            _substitute(item, variables, source, f"$.scenarios[{index}]"),
+            source,
+            base,
+            f"$.scenarios[{index}]",
+        )
         for index, item in enumerate(scenarios_raw)
     )
     names = [scenario.name for scenario in scenarios]
@@ -229,7 +251,9 @@ def load_contract(path: str | Path, *, allow_unasserted: bool = False) -> Contra
         if baseline_raw is not None
         else None
     )
-    contract = Contract(source, name, targets, scenarios, timeouts, limits, baseline, version)
+    contract = Contract(
+        source, name, targets, scenarios, timeouts, limits, variables, baseline, version
+    )
     _validate_mode(contract, allow_unasserted=allow_unasserted)
     return contract
 
@@ -275,6 +299,24 @@ def _target(name: str, value: Any, source: Path, base: Path, field_path: str) ->
         raise ContractError(source, field_path, "http targets cannot declare command, cwd, or env")
     if not url.startswith(("http://", "https://")):
         raise ContractError(source, f"{field_path}.url", "must be an http:// or https:// URL")
+    parsed_url = urlsplit(url)
+    if parsed_url.username is not None or parsed_url.password is not None:
+        raise ContractError(
+            source,
+            f"{field_path}.url",
+            "URL credentials are not allowed; use a header from_env reference",
+        )
+    sensitive_query = sorted(
+        name
+        for name, _ in parse_qsl(parsed_url.query, keep_blank_values=True)
+        if _SENSITIVE_NAME.search(name)
+    )
+    if sensitive_query:
+        raise ContractError(
+            source,
+            f"{field_path}.url",
+            f"credential-like query fields are not allowed: {', '.join(sensitive_query)}",
+        )
     workspace = _resolve_path(
         base,
         _string(data.get("workspace", "."), source, f"{field_path}.workspace"),
@@ -432,8 +474,8 @@ def _command(
 def _normalization(value: Any, source: Path, field_path: str) -> NormalizationSpec:
     data = _mapping(value, source, field_path)
     _unknown(data, {"ignore", "redact", "replace", "builtins"}, source, field_path)
-    ignore = tuple(_string_list(data.get("ignore", []), source, f"{field_path}.ignore"))
-    redact = tuple(_string_list(data.get("redact", []), source, f"{field_path}.redact"))
+    ignore = _json_paths(data.get("ignore", []), source, f"{field_path}.ignore")
+    redact = _json_paths(data.get("redact", []), source, f"{field_path}.redact")
     builtins = tuple(_string_list(data.get("builtins", []), source, f"{field_path}.builtins"))
     unknown_builtins = sorted(set(builtins) - _BUILTINS)
     if unknown_builtins:
@@ -442,7 +484,10 @@ def _normalization(value: Any, source: Path, field_path: str) -> NormalizationSp
         )
     replace_data = _mapping(data.get("replace", {}), source, f"{field_path}.replace")
     replace = tuple(
-        (str(path), _json(value, source, f"{field_path}.replace.{path}"))
+        (
+            _json_path(str(path), source, f"{field_path}.replace.{path}"),
+            _json(value, source, f"{field_path}.replace.{path}"),
+        )
         for path, value in replace_data.items()
     )
     return NormalizationSpec(ignore, redact, replace, builtins)
@@ -460,7 +505,13 @@ def _comparison(value: Any, source: Path, field_path: str) -> ComparisonSpec:
         if tolerance_raw is not None
         else None
     )
-    unordered = tuple(_string_list(data.get("unordered", []), source, f"{field_path}.unordered"))
+    unordered = _json_paths(data.get("unordered", []), source, f"{field_path}.unordered")
+    if kind != "json" and (tolerance is not None or unordered):
+        raise ContractError(
+            source,
+            field_path,
+            "numeric_tolerance and unordered are only valid for json comparison",
+        )
     return ComparisonSpec(kind, tolerance, unordered)
 
 
@@ -476,12 +527,13 @@ def _assertion(value: Any, source: Path, field_path: str) -> AssertionSpec:
     contains = _json(data.get("contains"), source, f"{field_path}.contains")
     paths_data = _mapping(data.get("paths_equal", {}), source, f"{field_path}.paths_equal")
     paths_equal = tuple(
-        (str(path), _json(item, source, f"{field_path}.paths_equal.{path}"))
+        (
+            _json_path(str(path), source, f"{field_path}.paths_equal.{path}"),
+            _json(item, source, f"{field_path}.paths_equal.{path}"),
+        )
         for path, item in paths_data.items()
     )
-    paths_absent = tuple(
-        _string_list(data.get("paths_absent", []), source, f"{field_path}.paths_absent")
-    )
+    paths_absent = _json_paths(data.get("paths_absent", []), source, f"{field_path}.paths_absent")
     return AssertionSpec(
         outcome, equals, "equals" in data, contains, "contains" in data, paths_equal, paths_absent
     )
@@ -564,6 +616,77 @@ def _resolve_path(base: Path, value: str) -> Path:
     return (base / path).resolve() if not path.is_absolute() else path.resolve()
 
 
+def _variables(value: Any, source: Path) -> dict[str, JsonValue]:
+    data = _mapping(value, source, "$.variables")
+    variables: dict[str, JsonValue] = {}
+    for raw_name, raw_value in data.items():
+        name = _string(raw_name, source, "$.variables")
+        if _VARIABLE_NAME.fullmatch(name) is None:
+            raise ContractError(
+                source,
+                f"$.variables.{name}",
+                "variable names must contain letters, numbers, and underscores and cannot "
+                "start with a number",
+            )
+        if _SENSITIVE_NAME.search(name):
+            raise ContractError(
+                source,
+                f"$.variables.{name}",
+                "scenario variables cannot hold credentials; use a target or command "
+                "from_env reference",
+            )
+        variables[name] = _json(raw_value, source, f"$.variables.{name}")
+    return variables
+
+
+def _substitute(
+    value: Any,
+    variables: dict[str, JsonValue],
+    source: Path,
+    field_path: str,
+) -> Any:
+    if isinstance(value, str):
+        whole = _VARIABLE_REFERENCE.fullmatch(value)
+        if whole is not None:
+            name = whole.group(1)
+            if name not in variables:
+                raise ContractError(source, field_path, f"unknown scenario variable {name!r}")
+            return copy.deepcopy(variables[name])
+
+        def replace(match: re.Match[str]) -> str:
+            name = match.group(1)
+            if name not in variables:
+                raise ContractError(source, field_path, f"unknown scenario variable {name!r}")
+            replacement = variables[name]
+            if isinstance(replacement, (dict, list)):
+                raise ContractError(
+                    source,
+                    field_path,
+                    f"scenario variable {name!r} must occupy the whole value because it is "
+                    "structured",
+                )
+            if replacement is None:
+                return "null"
+            if isinstance(replacement, bool):
+                return "true" if replacement else "false"
+            if isinstance(replacement, str):
+                return replacement
+            return json.dumps(replacement, ensure_ascii=False)
+
+        return _VARIABLE_REFERENCE.sub(replace, value)
+    if isinstance(value, list):
+        return [
+            _substitute(item, variables, source, f"{field_path}[{index}]")
+            for index, item in enumerate(value)
+        ]
+    if isinstance(value, dict):
+        return {
+            key: _substitute(item, variables, source, f"{field_path}.{key}")
+            for key, item in value.items()
+        }
+    return value
+
+
 def _unknown(data: dict[Any, Any], allowed: set[str], source: Path, field_path: str) -> None:
     unknown = sorted(str(key) for key in data if key not in allowed)
     if unknown:
@@ -596,6 +719,21 @@ def _string(value: Any, source: Path, field_path: str) -> str:
 def _string_list(value: Any, source: Path, field_path: str) -> list[str]:
     items = _list(value, source, field_path)
     return [_string(item, source, f"{field_path}[{index}]") for index, item in enumerate(items)]
+
+
+def _json_paths(value: Any, source: Path, field_path: str) -> tuple[str, ...]:
+    return tuple(
+        _json_path(path, source, f"{field_path}[{index}]")
+        for index, path in enumerate(_string_list(value, source, field_path))
+    )
+
+
+def _json_path(value: str, source: Path, field_path: str) -> str:
+    try:
+        parse_json_path(value)
+    except JsonPathError as exc:
+        raise ContractError(source, field_path, str(exc)) from exc
+    return value
 
 
 def _integer(value: Any, source: Path, field_path: str) -> int:

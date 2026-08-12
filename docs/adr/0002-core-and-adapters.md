@@ -19,7 +19,7 @@ Keep these internal:
 - Comparison and verdict aggregation
 - Evidence serialization
 
-Use a target seam because stdio and Streamable HTTP are two real adapters. Use observer and comparator registries because v0.1 has multiple implementations of each. Do not create a general plugin API in v0.1. A custom probe is a deliberately narrow subprocess protocol, not an in-process plugin framework.
+Use a target seam because stdio and Streamable HTTP are two real adapters. Keep observer and comparison dispatch internal because v0.1 has several built-in implementations but no proven third-party extension contract. Do not create a general plugin API in v0.1. A custom probe is a deliberately narrow subprocess protocol, not an in-process plugin framework.
 
 ## Invariants
 

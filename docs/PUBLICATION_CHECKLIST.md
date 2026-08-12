@@ -16,6 +16,7 @@ Confirm the README logo, demo, badges, install command, examples, security bound
 ## Repository settings
 
 - Enable Issues and Discussions.
+- Apply the labels in `.github/labels.yml` and open the reviewed drafts from `docs/CONTRIBUTOR_ISSUES.md`.
 - Disable the wiki unless it has a maintained purpose.
 - Enable private vulnerability reporting, Dependabot alerts, and automated security updates.
 - Add a `pypi` environment with required reviewer approval.
@@ -26,19 +27,14 @@ Confirm the README logo, demo, badges, install command, examples, security bound
 
 - Configure a PyPI trusted publisher for `.github/workflows/release.yml`, environment `pypi`.
 - Push the reviewed `main` commit and wait for every CI job to pass.
+- Confirm all twelve operating-system and Python matrix jobs pass.
 - Run the composite action from a separate test repository before declaring it stable.
 - Create a signed or annotated `v0.1.0` tag only after the repository and publisher settings are confirmed.
 - Verify the GitHub Release, PyPI metadata, checksums, and clean-environment install using [the release process](RELEASING.md).
 
 ## First public issue set
 
-Open issues only for work the maintainer intends to support. Useful first milestones are:
-
-- Windows process-tree containment and CI coverage
-- richer semantic matchers for unordered collections and numeric tolerances
-- opt-in observer plugins with a stable extension interface
-- an evidence schema compatibility policy before version 2
-- published examples for authentication and long-lived HTTP sessions
+Open issues only for work the maintainer intends to support. The reviewed drafts are in [CONTRIBUTOR_ISSUES.md](CONTRIBUTOR_ISSUES.md). The first set covers a binary comparison example, expected MCP errors, Unicode filenames, authenticated HTTP documentation, controlled repeat runs, Docker isolation, a Postgres observer design, and the future extension boundary.
 
 Avoid a broad roadmap. Label concrete, reviewable work as `good first issue` only after the expected behavior and test seam are documented.
 
@@ -46,6 +42,6 @@ Avoid a broad roadmap. Label concrete, reviewable work as `good first issue` onl
 
 - Publish release notes from `docs/releases/v0.1.0.md`.
 - State the alpha stability level and supported Python versions plainly.
-- Link one expectations example, one baseline example, and one differential example.
+- Link the value-drift, wrong-effect, and nondeterminism examples.
 - Include the security boundary: contracts and observed programs are trusted code.
 - Invite bug reports and evidence-backed compatibility cases, not stars or vanity metrics.

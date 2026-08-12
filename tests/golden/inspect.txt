@@ -1,0 +1,4 @@
+golden — DIVERGE
+mode: differential
+digest: 2cb81f4ee90114f4b78a95889a2eb86e421053c06cf103f8e346e1f1b56d67a3
+  DIVERGE      value drift

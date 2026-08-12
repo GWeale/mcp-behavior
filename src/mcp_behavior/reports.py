@@ -6,18 +6,30 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree
 
-from .models import JsonValue, Verdict, VerificationReport
+from .models import Difference, JsonValue, Verdict, VerificationReport
 
 
-def render_report(report: VerificationReport, format_name: str) -> str:
+def render_report(
+    report: VerificationReport,
+    format_name: str,
+    *,
+    color: bool = False,
+    difference_limit: int | None = None,
+    verbosity: str = "normal",
+) -> str:
     """Render a verification report without changing its semantic payload."""
 
     if format_name == "terminal":
-        return _terminal(report)
+        return _terminal(
+            report,
+            color=color,
+            difference_limit=difference_limit,
+            verbosity=verbosity,
+        )
     if format_name == "json":
         return json.dumps(report.to_dict(), ensure_ascii=False, sort_keys=True, indent=2) + "\n"
     if format_name == "markdown":
-        return _markdown(report)
+        return _markdown(report, difference_limit=difference_limit)
     if format_name == "junit":
         return _junit(report)
     raise ValueError(f"unknown report format {format_name!r}")
@@ -30,47 +42,103 @@ def write_rendered_report(report: VerificationReport, format_name: str, path: Pa
     return output
 
 
-def render_manifest(manifest: dict[str, JsonValue], format_name: str) -> str:
+def render_manifest(
+    manifest: dict[str, JsonValue],
+    format_name: str,
+    *,
+    color: bool = False,
+    verbosity: str = "normal",
+) -> str:
     """Render a previously written evidence manifest for inspection."""
 
     if format_name == "json":
         return json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
     if format_name != "terminal":
         raise ValueError("inspect format must be terminal or json")
+    if verbosity == "quiet":
+        return _paint(str(manifest.get("verdict", "<unknown>")), color) + "\n"
     scenarios = manifest.get("scenarios")
     lines = [
-        f"{manifest.get('contract_name', '<unknown>')} — {manifest.get('verdict', '<unknown>')}",
+        f"{manifest.get('contract_name', '<unknown>')} — "
+        f"{_paint(str(manifest.get('verdict', '<unknown>')), color)}",
         f"mode: {manifest.get('mode', '<unknown>')}",
         f"digest: {manifest.get('semantic_digest', '<missing>')}",
     ]
     if isinstance(scenarios, list):
         for scenario in scenarios:
             if isinstance(scenario, dict):
-                lines.append(f"  {scenario.get('verdict', '?'):12} {scenario.get('name', '?')}")
+                verdict = str(scenario.get("verdict", "?"))
+                lines.append(f"  {_paint(f'{verdict:12}', color)} {scenario.get('name', '?')}")
+                if verbosity == "verbose":
+                    lines.append(f"    error: {scenario.get('error') or '<none>'}")
     return "\n".join(lines) + "\n"
 
 
-def _terminal(report: VerificationReport) -> str:
+def _terminal(
+    report: VerificationReport,
+    *,
+    color: bool,
+    difference_limit: int | None,
+    verbosity: str,
+) -> str:
+    if verbosity == "quiet":
+        return _paint(str(report.verdict), color) + "\n"
     lines = [
-        f"MCP Behavior: {report.verdict}",
+        f"MCP Behavior: {_paint(str(report.verdict), color)}",
         f"mode: {report.mode}",
         f"digest: {report.semantic_digest}",
     ]
+    if verbosity == "verbose":
+        lines.append(f"duration: {report.duration_ms} ms")
     for scenario in report.scenarios:
-        lines.append(f"\n{scenario.verdict:12} {scenario.name}")
+        lines.append(f"\n{_paint(f'{scenario.verdict:12}', color)} {scenario.name}")
+        if verbosity == "verbose":
+            lines.append(f"  duration: {scenario.duration_ms} ms")
         if scenario.error:
             lines.append(f"  error: {scenario.error}")
         for call in scenario.calls:
-            lines.append(f"  {call.verdict:12} call {call.name} ({call.tool})")
-            lines.extend(f"    {item.path}: {item.message}" for item in call.differences)
+            lines.append(f"  {_paint(f'{call.verdict:12}', color)} call {call.name} ({call.tool})")
+            _append_differences(lines, call.differences, difference_limit)
+            if verbosity == "verbose":
+                lines.append(f"    duration: {call.duration_ms} ms")
+                lines.append(f"    reference: {_display(call.reference)}")
+                lines.append(f"    candidate: {_display(call.candidate)}")
         for effect in scenario.effects:
-            lines.append(f"  {effect.verdict:12} effect {effect.name} ({effect.kind})")
-            lines.extend(f"    {item.path}: {item.message}" for item in effect.differences)
+            lines.append(
+                f"  {_paint(f'{effect.verdict:12}', color)} effect {effect.name} ({effect.kind})"
+            )
+            _append_differences(lines, effect.differences, difference_limit)
+            if verbosity == "verbose":
+                lines.append(f"    duration: {effect.duration_ms} ms")
+                lines.append(f"    reference: {_display(effect.reference)}")
+                lines.append(f"    candidate: {_display(effect.candidate)}")
     lines.append(f"\nevidence: {report.evidence_dir}")
     return "\n".join(lines) + "\n"
 
 
-def _markdown(report: VerificationReport) -> str:
+def _append_differences(
+    lines: list[str], differences: tuple[Difference, ...], difference_limit: int | None
+) -> None:
+    shown = differences if difference_limit is None else differences[:difference_limit]
+    lines.extend(f"    {item.path}: {item.message}" for item in shown)
+    hidden = len(differences) - len(shown)
+    if hidden:
+        lines.append(f"    … {hidden} more difference(s); use --diff-detail full")
+
+
+def _display(value: JsonValue) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _paint(value: str, enabled: bool) -> str:
+    if not enabled:
+        return value
+    verdict = value.strip()
+    code = {"MATCH": "32", "DIVERGE": "31", "INCONCLUSIVE": "33"}.get(verdict)
+    return f"\x1b[{code}m{value}\x1b[0m" if code is not None else value
+
+
+def _markdown(report: VerificationReport, *, difference_limit: int | None) -> str:
     lines = [
         "# MCP Behavior report",
         "",
@@ -101,8 +169,12 @@ def _markdown(report: VerificationReport) -> str:
             lines.extend(["", f"## {scenario.name}", ""])
             if scenario.error:
                 lines.append(f"Error: {scenario.error}")
-            for subject, path, message in differences:
+            shown = differences if difference_limit is None else differences[:difference_limit]
+            for subject, path, message in shown:
                 lines.append(f"- {subject} at `{path}`: {message}")
+            hidden = len(differences) - len(shown)
+            if hidden:
+                lines.append(f"- {hidden} more difference(s); use `--diff-detail full`")
     return "\n".join(lines) + "\n"
 
 

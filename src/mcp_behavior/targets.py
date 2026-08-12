@@ -137,7 +137,7 @@ async def connect_target(spec: TargetSpec, contract: Contract) -> AsyncIterator[
                 if secret:
                     secrets.append(secret)
             http_client = await stack.enter_async_context(
-                httpx2.AsyncClient(headers=headers, follow_redirects=True)
+                httpx2.AsyncClient(headers=headers, follow_redirects=False)
             )
             transport = streamable_http_client(spec.url, http_client=http_client)
 

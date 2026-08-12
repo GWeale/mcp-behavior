@@ -141,6 +141,34 @@ scenarios:
         load_contract(path)
 
 
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://user:password@example.test/mcp",
+        "https://example.test/mcp?api_key=plaintext",
+    ],
+)
+def test_http_urls_cannot_embed_credentials(tmp_path: Path, url: str) -> None:
+    path = _write(
+        tmp_path,
+        f"""
+version: 1
+targets:
+  candidate:
+    transport: http
+    url: {url}
+scenarios:
+  - name: status
+    calls:
+      - tool: status
+        expect: {{outcome: success}}
+""",
+    )
+
+    with pytest.raises(ContractError, match=r"credentials|credential-like"):
+        load_contract(path)
+
+
 def test_environment_reference_resolves_without_entering_description(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -231,3 +259,97 @@ scenarios:
 
     with pytest.raises(ContractError, match="cannot declare url"):
         load_contract(path)
+
+
+def test_literal_scenario_variables_preserve_types_and_expand_strings(tmp_path: Path) -> None:
+    path = _write(
+        tmp_path,
+        """
+version: 1
+variables:
+  item_id: item-42
+  quantity: 3
+  expected: {status: active}
+targets:
+  candidate:
+    transport: stdio
+    command: [python, server.py]
+scenarios:
+  - name: verify ${item_id}
+    setup:
+      - command: [python, prepare.py, "--item=${item_id}"]
+    calls:
+      - tool: lookup
+        arguments:
+          id: ${item_id}
+          quantity: ${quantity}
+        expect:
+          contains: ${expected}
+""",
+    )
+
+    contract = load_contract(path)
+
+    scenario = contract.scenarios[0]
+    assert scenario.name == "verify item-42"
+    assert scenario.setup[0].command[-1] == "--item=item-42"
+    assert scenario.calls[0].arguments == {"id": "item-42", "quantity": 3}
+    assert scenario.calls[0].assertion is not None
+    assert scenario.calls[0].assertion.contains == {"status": "active"}
+
+
+def test_scenario_variables_cannot_read_environment_secrets(tmp_path: Path) -> None:
+    path = _write(
+        tmp_path,
+        """
+version: 1
+variables:
+  api_token: plaintext
+targets:
+  candidate: {transport: stdio, command: [python, server.py]}
+scenarios:
+  - name: status
+    calls:
+      - tool: status
+        expect: {outcome: success}
+""",
+    )
+
+    with pytest.raises(ContractError, match="cannot hold credentials"):
+        load_contract(path)
+
+
+def test_contract_rejects_invalid_json_paths_and_non_json_options(tmp_path: Path) -> None:
+    invalid_path = _write(
+        tmp_path,
+        """
+version: 1
+targets:
+  candidate: {transport: stdio, command: [python, server.py]}
+scenarios:
+  - name: status
+    calls:
+      - tool: status
+        normalize: {ignore: ["$.items[*]"]}
+        expect: {outcome: success}
+""",
+    )
+    with pytest.raises(ContractError, match="unsupported JSON path"):
+        load_contract(invalid_path)
+
+    invalid_options = _write(
+        tmp_path,
+        """
+version: 1
+targets:
+  candidate: {transport: stdio, command: [python, server.py]}
+scenarios:
+  - name: status
+    calls:
+      - tool: status
+        compare: {kind: text, numeric_tolerance: 0.1}
+        expect: {outcome: success}
+""",
+    )
+    with pytest.raises(ContractError, match="only valid for json"):
+        load_contract(invalid_options)

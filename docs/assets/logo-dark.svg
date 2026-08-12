@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">MCP Behavior logo for dark backgrounds</title>
+  <desc id="desc">Two MCP endpoints joined by a continuous behavioral signal</desc>
+  <defs>
+    <linearGradient id="signalDark" x1="34" y1="32" x2="104" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d9ecff"/>
+      <stop offset="0.34" stop-color="#8dc9ff"/>
+      <stop offset="0.52" stop-color="#279cff"/>
+      <stop offset="0.72" stop-color="#2dc3ce"/>
+      <stop offset="1" stop-color="#55dfa9"/>
+    </linearGradient>
+    <linearGradient id="mintNodeDark" x1="17" y1="84" x2="45" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67e5bb"/>
+      <stop offset="1" stop-color="#42d39f"/>
+    </linearGradient>
+  </defs>
+  <path
+    d="M83 32H57C42 32 34 40 34 52C34 64 43 70 55 70C63 70 65 57 72 57C80 57 82 72 91 72C104 72 112 79 112 91C112 103 103 110 90 110H45"
+    fill="none"
+    stroke="url(#signalDark)"
+    stroke-width="14"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <rect x="82" y="18" width="30" height="30" rx="7" fill="#d9ecff"/>
+  <rect x="16" y="84" width="30" height="30" rx="7" fill="url(#mintNodeDark)"/>
+</svg>

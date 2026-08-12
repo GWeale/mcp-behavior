@@ -1,5 +1,8 @@
 <div align="center">
-  <img src="docs/assets/logo.svg" width="112" alt="MCP Behavior logo">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+    <img src="docs/assets/logo.svg" width="120" alt="MCP Behavior logo">
+  </picture>
   <h1>MCP Behavior</h1>
   <p>Parity tests for MCP migrations, including returned values and observable side effects.</p>
 
@@ -225,6 +228,7 @@ MCP Behavior focuses on parity during an MCP server migration: run the same work
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Security model](docs/SECURITY.md)
 - [CI and GitHub Action](docs/CI.md)
+- [Brand assets](docs/BRAND.md)
 - [Provenance and license audit](docs/PROVENANCE.md)
 - [v0.1.0 requirement audit](docs/RELEASE_AUDIT.md)
 - [GitHub publication checklist](docs/PUBLICATION_CHECKLIST.md)

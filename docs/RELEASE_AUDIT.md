@@ -89,6 +89,6 @@ This ledger maps the v0.1.0 release requirements to code, public artifacts, and 
 
 ## Publication boundary
 
-The local candidate may be committed and rebuilt without changing public state. The following remain prohibited until explicit approval: creating the public repository, pushing, applying remote settings, opening issues, creating a tag or release, publishing to PyPI, or announcing the project.
+GitHub-only source publication was approved on 2026-08-11. That approval covers creating `GWeale/mcp-behavior`, pushing the reviewed commit, applying repository settings, and opening the reviewed contributor issues.
 
-After approval, follow [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md), publish only the reviewed commit, wait for the full CI matrix, verify the composite action in a separate repository, install from PyPI, and rerun every README command from a fresh environment. The release is incomplete until those public checks pass.
+Tags, GitHub Releases, PyPI publishing, and announcements remain outside the approved scope. After the source repository is public, wait for the full CI matrix and verify the README commands plus composite action from clean environments.

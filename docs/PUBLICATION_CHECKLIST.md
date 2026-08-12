@@ -6,7 +6,7 @@ Use this checklist when the local release candidate is approved for publication.
 
 - Repository: `GWeale/mcp-behavior`
 - Visibility: public
-- Description: `Deterministic regression tests for what MCP tools actually do.`
+- Description: `Parity tests for MCP migrations, including tool results and observable side effects.`
 - Website: leave empty until the documentation has a stable public URL
 - Topics: `mcp`, `model-context-protocol`, `testing`, `regression-testing`, `python`, `developer-tools`, `ai-agents`
 - Social preview: upload `docs/assets/social-preview.png`
@@ -19,12 +19,12 @@ Confirm the README logo, demo, badges, install command, examples, security bound
 - Apply the labels in `.github/labels.yml` and open the reviewed drafts from `docs/CONTRIBUTOR_ISSUES.md`.
 - Disable the wiki unless it has a maintained purpose.
 - Enable private vulnerability reporting, Dependabot alerts, and automated security updates.
-- Add a `pypi` environment with required reviewer approval.
 - Protect `main`: require pull requests, the `CI / test` matrix, resolved conversations, and no force pushes or deletions.
 - Preserve squash, rebase, or merge commits according to the maintainer's preference; automatically delete merged branches.
 
 ## Release plumbing
 
+- GitHub-only source publication was approved on 2026-08-11. PyPI publishing, tags, and GitHub Releases require separate approval.
 - Configure a PyPI trusted publisher for `.github/workflows/release.yml`, environment `pypi`.
 - Push the reviewed `main` commit and wait for every CI job to pass.
 - Confirm all twelve operating-system and Python matrix jobs pass.

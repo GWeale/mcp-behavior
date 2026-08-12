@@ -4,7 +4,7 @@ Updated: 2026-08-11
 
 ## Current phase
 
-Corrected local v0.1.0 release candidate is complete and awaiting explicit publication approval. No remote repository, package, tag, issue, or remote setting has been created.
+GitHub-only source publication was approved on 2026-08-11. The reviewed alpha will be published as `GWeale/mcp-behavior`; no package, tag, GitHub Release, or announcement is approved.
 
 ## Completed
 
@@ -46,11 +46,9 @@ Corrected local v0.1.0 release candidate is complete and awaiting explicit publi
 - The configured Linux/macOS/Windows CI matrix and composite action cannot be verified remotely until the reviewed commit is pushed.
 - GitHub and package-registry name availability must be repeated immediately before creating public resources.
 
-## Publication boundary
+## Next actions
 
-The remaining work changes public state and requires explicit approval:
-
-- Create the public `GWeale/mcp-behavior` GitHub repository and push `main`.
+- Create the public `GWeale/mcp-behavior` GitHub repository and push the reviewed `main` commit.
 - Wait for the complete CI matrix, then apply repository topics, social preview, labels, issues, security settings, and branch protection.
-- Configure PyPI trusted publishing, tag `v0.1.0`, and publish the GitHub/PyPI release.
-- Verify the public install, checksums, release assets, and composite action from a separate repository.
+- Verify source installation, every README command, and the composite action from clean environments.
+- Request separate approval before configuring PyPI, creating a tag or GitHub Release, or announcing the project.

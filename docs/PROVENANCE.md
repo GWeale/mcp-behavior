@@ -20,7 +20,7 @@ The logo, social preview, and terminal demo are original repository-native SVG a
 
 ## Project name
 
-An exact-name check on 2026-08-08 found no `mcp-behavior` project on GitHub, PyPI, or npm. The availability check must be repeated immediately before the public repository and package are created.
+An exact-name check on 2026-08-11 found no `GWeale/mcp-behavior` repository on GitHub and no `mcp-behavior` project on PyPI. Package availability must be checked again before a package release.
 
 ## License review
 

@@ -9,8 +9,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: MCP Behavior version
-      placeholder: 0.1.0
+      label: MCP Behavior revision
+      placeholder: main at commit 0123456, or a release version
     validations:
       required: true
   - type: dropdown

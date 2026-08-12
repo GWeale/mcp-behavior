@@ -1,23 +1,22 @@
 <div align="center">
   <img src="docs/assets/logo.svg" width="112" alt="MCP Behavior logo">
   <h1>MCP Behavior</h1>
-  <p>Deterministic regression tests for what MCP tools actually do.</p>
+  <p>Parity tests for MCP migrations, including returned values and observable side effects.</p>
 
   [![CI](https://github.com/GWeale/mcp-behavior/actions/workflows/ci.yml/badge.svg)](https://github.com/GWeale/mcp-behavior/actions/workflows/ci.yml)
-  [![PyPI](https://img.shields.io/pypi/v/mcp-behavior.svg)](https://pypi.org/project/mcp-behavior/)
-  [![Python](https://img.shields.io/pypi/pyversions/mcp-behavior.svg)](https://pypi.org/project/mcp-behavior/)
+  [![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg)](https://www.python.org/downloads/)
   [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 </div>
 
-An MCP tool schema describes an interface. It cannot tell you whether a migration changed the returned values, wrote a different file, or updated the wrong database row. MCP Behavior runs named scenarios and compares the results plus any effects you explicitly observe.
+An MCP tool schema can remain unchanged while a rewrite returns a different business value, writes the wrong file, or updates the wrong database row. MCP Behavior runs the same named scenario against the old and new servers, then compares the results plus any effects you explicitly observe.
 
 It supports three workflows:
 
 | Workflow | What it compares |
 |---|---|
-| Expectations | One live target against assertions in YAML |
-| Baseline | One live target against a reviewed JSON recording |
 | Differential | A candidate and reference MCP server against each other |
+| Baseline | One live target against a reviewed JSON recording |
+| Expectations | One live target against assertions in YAML |
 
 Every run ends as `MATCH`, `DIVERGE`, or `INCONCLUSIVE`. The process exits with code 0, 1, or 2 respectively. Uncertainty never passes as a match.
 
@@ -49,16 +48,16 @@ The runnable [differential example](examples/differential/) produces this result
 
 ## Install
 
-MCP Behavior requires Python 3.11 or newer.
+MCP Behavior requires Python 3.11 or newer. Until the first package release, install the current alpha directly from GitHub:
 
 ```bash
-pipx install mcp-behavior
+pipx install git+https://github.com/GWeale/mcp-behavior.git
 ```
 
 You can also run it without a persistent install:
 
 ```bash
-uvx mcp-behavior --help
+uvx --from git+https://github.com/GWeale/mcp-behavior.git mcp-behavior --help
 ```
 
 ## 60-second quickstart
@@ -168,11 +167,13 @@ mcp-behavior verify mcp-behavior.yaml \
 The repository also includes a composite GitHub Action:
 
 ```yaml
-- uses: GWeale/mcp-behavior@v0.1.0
+- uses: GWeale/mcp-behavior@main
   with:
     contract: mcp-behavior.yaml
     report: .mcp-behavior/report.xml
 ```
+
+`main` is the alpha channel until the first versioned release. Pin a commit SHA if your CI requires an immutable action reference.
 
 See [CI setup](docs/CI.md) for artifact upload and test-report publishing examples.
 
@@ -209,7 +210,7 @@ The verification core owns connection management, ordering, time budgets, cleanu
 
 ## What this project covers
 
-MCP Behavior focuses on executed values and declared effects. Use the official MCP Inspector for interactive protocol debugging, the MCP conformance suite for protocol compliance, `mcp-contracts` for schema compatibility, and `mcp-lock` for package integrity. The [positioning note](docs/POSITIONING.md) records the boundary and links to those projects.
+MCP Behavior focuses on parity during an MCP server migration: run the same workflow against two implementations and compare returned values plus declared state changes. Use the official MCP Inspector for interactive exploration and general scripted calls, the conformance suite for protocol compliance, MCP Test Harness for broad code-first server testing, `mcp-contracts` for schema compatibility, and `mcp-lock` for package integrity. The [positioning note](docs/POSITIONING.md) records the boundary and links to those projects.
 
 ## Documentation
 
@@ -232,4 +233,4 @@ MCP Behavior focuses on executed values and declared effects. Use the official M
 - [Contributor issue drafts](docs/CONTRIBUTOR_ISSUES.md)
 - [Contributing](CONTRIBUTING.md)
 
-The project is preparing its first alpha release. Contract and evidence schemas are versioned; backward compatibility starts with the first published release.
+This repository is an alpha. Contract and evidence schemas are versioned; backward compatibility starts with the first versioned release.

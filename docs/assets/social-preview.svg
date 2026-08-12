@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
   <title id="title">MCP Behavior</title>
-  <desc id="desc">Deterministic regression tests for what MCP tools actually do</desc>
+  <desc id="desc">Parity tests for MCP migrations, including returned values and observable side effects</desc>
   <defs>
     <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#111d31"/>
@@ -30,8 +30,8 @@
 
   <g font-family="Inter, Segoe UI, Arial, sans-serif">
     <text x="120" y="315" fill="#f8fafc" font-size="72" font-weight="700" letter-spacing="-2">MCP Behavior</text>
-    <text x="120" y="374" fill="#cbd5e1" font-size="30" font-weight="400">Regression tests for what</text>
-    <text x="120" y="414" fill="#cbd5e1" font-size="30" font-weight="400">MCP tools actually do.</text>
+    <text x="120" y="374" fill="#cbd5e1" font-size="30" font-weight="400">Parity tests for</text>
+    <text x="120" y="414" fill="#cbd5e1" font-size="30" font-weight="400">MCP migrations.</text>
   </g>
 
   <g transform="translate(120 456)" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="20">

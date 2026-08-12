@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: GWeale/mcp-behavior@v0.1.0
+      - uses: GWeale/mcp-behavior@main
         with:
           contract: mcp-behavior.yaml
           evidence: .mcp-behavior/evidence
@@ -31,7 +31,7 @@ jobs:
           path: .mcp-behavior/
 ```
 
-The action installs the pinned release specified by its `version` input, runs verification, writes JUnit, and leaves evidence for later upload. It does not upload artifacts on its own.
+The action installs MCP Behavior from the selected Action ref, runs verification, writes JUnit, and leaves evidence for later upload. It does not upload artifacts on its own. `main` is the alpha channel until the first versioned release; pin a commit SHA for an immutable action reference.
 
 The repository CI matrix runs Python 3.11 through 3.14 on Ubuntu, macOS, and Windows. Its package job builds the wheel and source archive, verifies their metadata and provenance, installs the wheel in a fresh environment, and runs all five public examples with their documented exit codes.
 

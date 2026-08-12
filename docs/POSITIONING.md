@@ -1,16 +1,18 @@
 # Positioning
 
-Updated: 2026-08-08
+Updated: 2026-08-11
 
 ## One sentence
 
-MCP Behavior runs the same declared scenario against MCP implementations and proves whether their returned values and observable effects agree.
+MCP Behavior is a parity gate for MCP migrations: it runs the same declared scenario against old and new servers, then compares returned values and observable effects.
 
 ## The gap
 
-The official MCP Inspector is interactive developer tooling for connecting to and exercising servers. The official conformance framework validates protocol implementations. `mcp-contracts` snapshots and compares exposed schemas and runs schema-oriented boundary checks. `mcp-lock` pins package identity and integrity.
+The official MCP Inspector provides Web, TUI, and scriptable CLI clients for inspecting and exercising servers. Its CLI works in automation and CI. The official conformance framework validates protocol implementations. `mcp-contracts` snapshots and compares exposed schemas and runs schema-oriented boundary checks. `mcp-lock` pins package identity and integrity.
 
-Those are useful adjacent tools. MCP Behavior deliberately starts after protocol and schema validity: a tool can keep the same name, description, and JSON Schema while returning a different business result, writing the wrong file, or mutating the wrong state.
+Broader test frameworks also overlap with parts of MCP Behavior. MCP Test Harness is a code-first framework for functional, snapshot, performance, resiliency, and security testing. MCP Observatory focuses on CI-native security testing, schema drift, and health scoring.
+
+MCP Behavior takes a narrower path. It starts after protocol and schema validity, at the point where a team is replacing or refactoring a server. A tool can keep the same name, description, and JSON Schema while returning a different business result, writing the wrong file, or mutating the wrong state. Differential execution and declared effect observers make that migration visible in one reviewable report.
 
 ## In scope
 
@@ -37,3 +39,5 @@ Those are useful adjacent tools. MCP Behavior deliberately starts after protocol
 - MCP conformance: https://github.com/modelcontextprotocol/conformance
 - MCP Contracts: https://github.com/mcp-contracts/mcp-contracts
 - MCP Lock: https://github.com/mcpguards/mcp-lock
+- MCP Test Harness: https://github.com/vaquarkhan/mcp-test-harness
+- MCP Observatory: https://github.com/KryptosAI/mcp-observatory

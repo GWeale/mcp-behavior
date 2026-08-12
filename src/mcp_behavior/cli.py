@@ -54,7 +54,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mcp-behavior",
-        description="Deterministic regression tests for what MCP tools actually do.",
+        description=(
+            "Parity tests for MCP migrations, including tool results and observable side effects."
+        ),
         epilog=(
             "Start with `mcp-behavior init`, then run `mcp-behavior verify mcp-behavior.yaml`."
         ),

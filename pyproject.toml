@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "mcp-behavior"
 version = "0.1.0"
-description = "Deterministic regression tests for what MCP tools actually do."
+description = "Parity tests for MCP migrations, including tool results and observable side effects."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"

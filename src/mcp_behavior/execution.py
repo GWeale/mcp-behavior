@@ -61,7 +61,7 @@ async def run_command(
 
     kwargs: dict[str, Any] = {}
     if os.name == "nt":
-        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+        kwargs["creationflags"] = subprocess.__dict__["CREATE_NEW_PROCESS_GROUP"]
     else:
         kwargs["start_new_session"] = True
 

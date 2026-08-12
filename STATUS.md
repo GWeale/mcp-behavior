@@ -4,7 +4,7 @@ Updated: 2026-08-11
 
 ## Current phase
 
-GitHub-only source publication was approved on 2026-08-11. The reviewed alpha will be published as `GWeale/mcp-behavior`; no package, tag, GitHub Release, or announcement is approved.
+The reviewed alpha is public as [`GWeale/mcp-behavior`](https://github.com/GWeale/mcp-behavior). GitHub source installation and the composite Action are supported; no package, tag, GitHub Release, or announcement is approved.
 
 ## Completed
 
@@ -20,6 +20,8 @@ GitHub-only source publication was approved on 2026-08-11. The reviewed alpha wi
 - Added the five-command CLI, four report formats, composite GitHub Action, and five runnable example suites.
 - Added public references for architecture, contracts, normalization, effects, evidence, API, CLI, compatibility, CI, security, troubleshooting, provenance, and release audit.
 - Added original vector assets, community files, label catalog, eight contributor issue drafts, ranked roadmap, CI, and release automation.
+- Published the reviewed source on GitHub with a focused description, ten topics, Discussions, fourteen project labels, and eight scoped contributor issues.
+- Enabled secret scanning, push protection, vulnerability alerts, automated security updates, and private vulnerability reporting.
 
 ## Validation
 
@@ -38,17 +40,20 @@ GitHub-only source publication was approved on 2026-08-11. The reviewed alpha wi
 - Public examples: expectations and baseline return `MATCH`; value drift and wrong effect return `DIVERGE`; abrupt exit returns `INCONCLUSIVE`.
 - Visual QA: README demo and 1280 x 640 social preview inspected at rendered size.
 - Clean-room scan: no private-project provenance found in public source or distribution archives.
+- Public CI: quality, packaging, and the 12-job Python 3.11-3.14 matrix pass on Linux, macOS, and Windows.
+- Public installation: isolated `pipx` and `uvx` installs from the GitHub URL expose the documented CLI.
+- Public examples: all five suites pass from a fresh public clone with their documented exit codes.
+- Composite Action: a separate private consumer repository passed `GWeale/mcp-behavior@main` and uploaded its evidence and JUnit report.
 
 ## Known risks
 
 - v0.1.0 is an alpha. Contract, baseline, and evidence schema compatibility begins with the first published release.
 - Local servers, lifecycle commands, and custom probes are trusted code. Timeouts and containment are not a hostile-code sandbox.
-- The configured Linux/macOS/Windows CI matrix and composite action cannot be verified remotely until the reviewed commit is pushed.
-- GitHub and package-registry name availability must be repeated immediately before creating public resources.
+- Windows can occasionally delay a child MCP process long enough to produce the intentionally conservative `INCONCLUSIVE` verdict; repeated public-source runs and the full CI matrix pass.
+- The social preview image is committed at `docs/assets/social-preview.png`; GitHub does not expose a public REST endpoint for assigning it to repository settings.
 
 ## Next actions
 
-- Create the public `GWeale/mcp-behavior` GitHub repository and push the reviewed `main` commit.
-- Wait for the complete CI matrix, then apply repository topics, social preview, labels, issues, security settings, and branch protection.
-- Verify source installation, every README command, and the composite action from clean environments.
+- Maintain the starter issues and use early adopter feedback to decide whether the contract and evidence formats are ready for a stable boundary.
+- Assign `docs/assets/social-preview.png` in the GitHub repository settings when a browser session is available.
 - Request separate approval before configuring PyPI, creating a tag or GitHub Release, or announcing the project.

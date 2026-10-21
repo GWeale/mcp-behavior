@@ -6,6 +6,7 @@ import os
 import sys
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 server = MCPServer("expected-error-example")
 
@@ -13,7 +14,7 @@ server = MCPServer("expected-error-example")
 @server.tool(structured_output=True)
 def lookup_item(item_id: str) -> dict[str, str]:
     if item_id != "known":
-        raise ValueError(f"unknown item: {item_id}")
+        raise ToolError(f"unknown item: {item_id}")
     return {"id": item_id, "status": "active"}
 
 

@@ -5,14 +5,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from mcp.server.mcpserver import MCPServer
-
-server = MCPServer("unicode-files-example")
 NAMES = ("猫.txt", "z.txt", "π.txt", "café-猫.txt", "A.txt")
 CONTENT = "Hello, 世界!\n"
 
 
-@server.tool(structured_output=True)
 def write_files() -> dict[str, int]:
     root = Path("unicode-files")
     root.mkdir(exist_ok=True)
@@ -33,4 +29,8 @@ if __name__ == "__main__":
     if sys.argv[1:] == ["--cleanup"]:
         cleanup()
     else:
+        from mcp.server.mcpserver import MCPServer
+
+        server = MCPServer("unicode-files-example")
+        server.tool(structured_output=True)(write_files)
         server.run("stdio")

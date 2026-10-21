@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import subprocess
 import sys
 import unicodedata
 from pathlib import Path
 from typing import Any
 
+import pytest
 import yaml
 
 from mcp_behavior import Verdict, verify
@@ -58,3 +60,16 @@ def test_unicode_file_and_tree_observations_are_stable(tmp_path: Path) -> None:
         "π.txt",
         "猫.txt",
     ]
+
+
+@pytest.mark.parametrize("example", ["unicode-files"])
+def test_example_cleanup_works_without_site_packages(tmp_path: Path, example: str) -> None:
+    result = subprocess.run(
+        [sys.executable, "-S", str(EXAMPLES / example / "server.py"), "--cleanup"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=5,
+    )
+    assert result.returncode == 0, result.stderr

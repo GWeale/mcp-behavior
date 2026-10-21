@@ -16,6 +16,7 @@ EXAMPLES = (
     ("differential", "diff", 1),
     ("wrong-effect", "verify", 1),
     ("nondeterminism", "verify", 2),
+    ("unicode-files", "verify", 0),
 )
 
 

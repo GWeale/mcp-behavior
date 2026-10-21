@@ -29,8 +29,9 @@ existing single-run verifier:
 
 ```python
 # Proposed API, not an import available in this release.
-summary = verify_repeated("mcp-behavior.yaml", "evidence", attempts=3,
-                          workspace_policy="fresh", total_seconds=120)
+summary = verify_repeated(
+    "mcp-behavior.yaml", "evidence", attempts=3, workspace_policy="fresh", total_seconds=120
+)
 ```
 
 Caller: `mcp-behavior repeat mcp-behavior.yaml --attempts 3 --total-seconds 120`.

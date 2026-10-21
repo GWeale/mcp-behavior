@@ -23,10 +23,14 @@ Each stage uses a separate temporary workspace. By default, workspaces and evide
 Write a strict expectations-mode starter contract.
 
 ```bash
-mcp-behavior init [path] [--force]
+mcp-behavior init [path] [--template file|sqlite|response] [--force]
 ```
 
 The default path is `mcp-behavior.yaml`. Existing files are preserved unless `--force` is explicit.
+
+`file` is the default template: it checks tool success and the exact UTF-8 contents of a declared file, including line endings. `sqlite` checks success and selected database rows with an explicit ordering. `response` checks tool success alone. Edit the server command, tool name, arguments, and expected state before running any starter. Observer paths resolve under the target workspace. These are editable templates, not automatic side-effect discovery.
+
+For semantic JSON fields rather than exact file text, use the [external JSON probe](../examples/external-observers/) through a command observer.
 
 ## `record`
 
@@ -72,6 +76,8 @@ mcp-behavior diff CONTRACT [options]
 | `--color never` | | disable color |
 
 JSON and JUnit always contain the complete difference set. Human output can be shortened without changing evidence or the exit code. If `NO_COLOR` is present in the environment, ANSI color is disabled even when `--color always` is passed.
+
+Terminal and Markdown differences include expected and actual JSON values, so escaped CRLF and LF remain distinguishable. Each human preview is limited to 240 characters plus a truncation notice. Full values remain in JSON reports and evidence; the semantic digest is unaffected by rendering.
 
 ## `inspect`
 

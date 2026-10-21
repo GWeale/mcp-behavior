@@ -56,13 +56,22 @@ def main() -> int:
         child_env["PATH"] = str(python.parent) + os.pathsep + child_env.get("PATH", "")
         _run([str(cli), "--version"], root, env=child_env, quiet=arguments.quiet)
         _run([str(cli), "--help"], root, env=child_env, quiet=arguments.quiet)
-        for command in ("init", "record", "verify", "diff", "inspect"):
+        for command in ("demo", "init", "record", "verify", "diff", "inspect"):
             _run(
                 [str(cli), command, "--help"],
                 root,
                 env=child_env,
                 quiet=arguments.quiet,
             )
+
+        for template in ("file", "sqlite", "response"):
+            _run(
+                [str(cli), "init", str(smoke_root / f"{template}.yaml"), "--template", template],
+                smoke_root,
+                env=child_env,
+                quiet=arguments.quiet,
+            )
+        _run([str(cli), "demo"], smoke_root, env=child_env, quiet=arguments.quiet)
 
         for name, command, contract, expected in EXAMPLES:
             example = root / "examples" / name

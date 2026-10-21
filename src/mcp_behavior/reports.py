@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from html import escape
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -120,7 +121,14 @@ def _append_differences(
     lines: list[str], differences: tuple[Difference, ...], difference_limit: int | None
 ) -> None:
     shown = differences if difference_limit is None else differences[:difference_limit]
-    lines.extend(f"    {item.path}: {item.message}" for item in shown)
+    for item in shown:
+        lines.extend(
+            (
+                f"    {item.path}: {item.message}",
+                f"      expected: {_preview(item.reference)}",
+                f"      actual:   {_preview(item.candidate)}",
+            )
+        )
     hidden = len(differences) - len(shown)
     if hidden:
         lines.append(f"    … {hidden} more difference(s); use --diff-detail full")
@@ -128,6 +136,16 @@ def _append_differences(
 
 def _display(value: JsonValue) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _preview(value: JsonValue) -> str:
+    text = _display(value)
+    return text if len(text) <= 240 else text[:240] + "… (full value in JSON evidence)"
+
+
+def _markdown_text(value: str) -> str:
+    # Reports can contain tool-controlled text; keep it literal, including backticks.
+    return escape(value).replace("`", "&#96;").replace("|", "&#124;").replace("\n", "<br>")
 
 
 def _paint(value: str, enabled: bool) -> str:
@@ -142,8 +160,8 @@ def _markdown(report: VerificationReport, *, difference_limit: int | None) -> st
     lines = [
         "# MCP Behavior report",
         "",
-        f"**Verdict:** `{report.verdict}`  ",
-        f"**Mode:** `{report.mode}`  ",
+        f"**Verdict:** `{report.verdict}`<br>",
+        f"**Mode:** `{report.mode}`<br>",
         f"**Semantic digest:** `{report.semantic_digest}`",
         "",
         "| Scenario | Verdict | Calls | Effects |",
@@ -151,27 +169,34 @@ def _markdown(report: VerificationReport, *, difference_limit: int | None) -> st
     ]
     for scenario in report.scenarios:
         lines.append(
-            f"| {scenario.name} | `{scenario.verdict}` | {len(scenario.calls)} | "
+            f"| {_markdown_text(scenario.name)} | `{scenario.verdict}` | {len(scenario.calls)} | "
             f"{len(scenario.effects)} |"
         )
     for scenario in report.scenarios:
         differences = [
-            (f"call `{call.name}`", item.path, item.message)
+            (f"call <code>{_markdown_text(call.name)}</code>", item)
             for call in scenario.calls
             for item in call.differences
         ]
         differences.extend(
-            (f"effect `{effect.name}`", item.path, item.message)
+            (f"effect <code>{_markdown_text(effect.name)}</code>", item)
             for effect in scenario.effects
             for item in effect.differences
         )
         if scenario.error or differences:
-            lines.extend(["", f"## {scenario.name}", ""])
+            lines.extend(["", f"## {_markdown_text(scenario.name)}", ""])
             if scenario.error:
-                lines.append(f"Error: {scenario.error}")
+                lines.append(f"Error: {_markdown_text(scenario.error)}")
             shown = differences if difference_limit is None else differences[:difference_limit]
-            for subject, path, message in shown:
-                lines.append(f"- {subject} at `{path}`: {message}")
+            for subject, item in shown:
+                lines.extend(
+                    (
+                        f"- {subject} at <code>{_markdown_text(item.path)}</code>: "
+                        f"{_markdown_text(item.message)}",
+                        f"  <br>Expected: <code>{_markdown_text(_preview(item.reference))}</code>",
+                        f"  <br>Actual: <code>{_markdown_text(_preview(item.candidate))}</code>",
+                    )
+                )
             hidden = len(differences) - len(shown)
             if hidden:
                 lines.append(f"- {hidden} more difference(s); use `--diff-detail full`")

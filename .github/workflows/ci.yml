@@ -59,3 +59,29 @@ jobs:
         with:
           name: distributions
           path: dist/
+
+  filesystem-case:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: true
+          python-version: "3.13"
+      - run: uv sync --all-groups --locked
+      - name: Install historical and fixed official filesystem servers
+        run: |
+          npm install --prefix .mcp-behavior/crlf-before --ignore-scripts --no-audit --no-fund @modelcontextprotocol/server-filesystem@2026.8.31
+          npm install --prefix .mcp-behavior/crlf-after --ignore-scripts --no-audit --no-fund @modelcontextprotocol/server-filesystem@2.0.0
+      - name: Reproduce CRLF regression and check independent byte controls
+        run: >-
+          uv run python examples/filesystem-crlf/reproduce.py
+          --before .mcp-behavior/crlf-before/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js
+          --after .mcp-behavior/crlf-after/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js
+          --evidence .mcp-behavior/crlf-evidence
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: filesystem-crlf-evidence
+          path: .mcp-behavior/crlf-evidence/
+          include-hidden-files: true

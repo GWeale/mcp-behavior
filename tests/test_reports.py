@@ -49,6 +49,10 @@ def test_all_report_formats_are_machine_or_human_readable(tmp_path: Path) -> Non
     junit = ElementTree.fromstring(render_report(report, "junit"))
 
     assert "DIVERGE" in terminal and "$.message" in terminal
+    assert 'expected: "a"' in terminal and 'actual:   "b"' in terminal
+    assert "Expected: <code>&quot;a&quot;</code>" in markdown
+    assert "Actual: <code>&quot;b&quot;</code>" in markdown
+    assert all(line == line.rstrip() for line in markdown.splitlines())
     assert "| echo | `DIVERGE`" in markdown
     assert json_report["semantic_digest"] == "abc123"
     assert junit.attrib["failures"] == "1"
@@ -101,6 +105,28 @@ def test_terminal_supports_first_diff_quiet_verbose_and_color(tmp_path: Path) ->
     assert quiet == "\x1b[31mDIVERGE\x1b[0m\n"
     assert "duration: 11 ms" in verbose
     assert 'reference: {"message":"a"}' in verbose
+
+
+def test_previews_escape_line_endings_bound_values_and_preserve_full_evidence(
+    tmp_path: Path,
+) -> None:
+    report = _report(tmp_path)
+    scenario = report.scenarios[0]
+    call = replace(
+        scenario.calls[0],
+        name="a`<script>|name",
+        differences=(Difference("$.text", "values differ", "c\r\nb\r\n", "x" * 1000),),
+    )
+    report = replace(report, scenarios=(replace(scenario, name="a|b", calls=(call,)),))
+    terminal = render_report(report, "terminal")
+    markdown = render_report(report, "markdown")
+    assert '"c\\r\\nb\\r\\n"' in terminal
+    assert "full value in JSON evidence" in terminal
+    assert "x" * 1000 not in terminal
+    assert "x" * 1000 in render_report(report, "json")
+    assert "a&#124;b" in markdown
+    assert "a&#96;&lt;script&gt;&#124;name" in markdown
+    assert "<script>" not in markdown
 
 
 def test_semantic_digest_excludes_all_runtime_durations() -> None:

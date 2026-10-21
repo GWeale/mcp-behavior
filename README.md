@@ -5,13 +5,23 @@
 [![CI](https://github.com/GWeale/mcp-behavior/actions/workflows/ci.yml/badge.svg)](https://github.com/GWeale/mcp-behavior/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-Regression tests for MCP servers. Compare tool responses and declared state changes against another server, a saved baseline, or YAML expectations.
+**Your MCP tool returned success. Did it write the right thing?**
 
-## A successful response can hide a wrong write
+Regression tests for MCP tool responses **and the state they change**. Declare file, directory, SQLite, or custom-probe checks in YAML; compare against expectations, a baseline, or another server.
 
-A tool returns `saved: true`, but writes **109** instead of the requested **100**. A response check passes. A file assertion catches the mismatch.
+## Same successful response. Different file bytes.
 
-See the intentional [wrong-write fixture](examples/wrong-effect/). MCP Behavior checks the effects you declare; it does not discover every side effect.
+The official filesystem server's `edit_file` used to replace CRLF line endings with LF while returning the expected edit diff. Upstream fixed it in [PR #5011](https://github.com/modelcontextprotocol/servers/pull/5011). We reproduced the historical regression using published versions:
+
+```text
+MATCH        2026.8.31    response-only    actual: c\nb\n
+DIVERGE      2026.8.31    state-observed   expected: c\r\nb\r\n
+MATCH        2.0.0        fixed-control    actual: c\r\nb\r\n
+```
+
+**[Watch the recorded demo](docs/assets/filesystem-crlf-demo.mp4)** · [Reproduce it](examples/filesystem-crlf/) · [Read the captured output](examples/filesystem-crlf/recording/transcript.txt)
+
+A direct SDK test with the same file assertion catches this too. MCP Behavior gives you one contract, verdict, and evidence bundle. It checks the effects you declare; it does not discover every side effect.
 
 ## Try it
 
@@ -21,7 +31,7 @@ Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+. No API key or existi
 uvx --from git+https://github.com/GWeale/mcp-behavior.git mcp-behavior demo
 ```
 
-The demo runs three real checks and removes its temporary files:
+This separate, intentional invoice fixture runs three real checks and removes its temporary files. It writes 109 while returning `saved: true` for a requested total of 100:
 
 ```text
 MATCH        response only: file total = 109
@@ -36,13 +46,13 @@ uv tool install git+https://github.com/GWeale/mcp-behavior.git
 mcp-behavior init
 ```
 
-Edit `mcp-behavior.yaml` with your server command, calls, and assertions, then run:
+The starter includes a file assertion. Edit the server command, tool arguments, expected path, and contents in `mcp-behavior.yaml`, then run:
 
 ```bash
 mcp-behavior verify mcp-behavior.yaml
 ```
 
-Add [observers](docs/EFFECTS.md) for files, directory trees, SQLite, or a custom probe. Start from the [complete example](examples/expectations/) or the [contract reference](docs/CONTRACT.md).
+Use `mcp-behavior init --template sqlite` for database rows, or `--template response` for tools with no state changes. For semantic JSON comparisons, adapt the [working JSON probe](examples/external-observers/). See the [complete example](examples/expectations/), [observers](docs/EFFECTS.md), and [contract reference](docs/CONTRACT.md).
 
 | Result | Meaning | Exit |
 |---|---|---:|
@@ -51,6 +61,8 @@ Add [observers](docs/EFFECTS.md) for files, directory trees, SQLite, or a custom
 | `INCONCLUSIVE` | The run could not establish a result. | 2 |
 
 Each run saves evidence and differences. Export reports as JSON, Markdown, or JUnit, or use the [GitHub Action](docs/CI.md) in CI.
+
+Found a response that hides a wrong state change? [Open a minimal, sanitized case](https://github.com/GWeale/mcp-behavior/issues/new?template=bug_report.yml) with server/version, request, expected state, and actual state. Reproducible cases are especially useful.
 
 ## Reference
 

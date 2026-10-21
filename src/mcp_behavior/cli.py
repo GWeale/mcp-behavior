@@ -31,7 +31,7 @@ targets:
     workspace: .mcp-behavior/workspace
 
 scenarios:
-  - name: example tool succeeds
+  - name: example tool succeeds and writes the expected state
     tags: [smoke]
     calls:
       - name: example
@@ -40,6 +40,39 @@ scenarios:
         expect:
           outcome: success
 """
+
+STARTER_OBSERVERS = {
+    "response": "",
+    "file": """    # Edit path and text to match a real write made by your tool.
+    # Paths are relative to the target workspace. Text is compared exactly,
+    # including line endings. Use a command observer for semantic JSON checks.
+    observers:
+      - name: expected file contents
+        kind: file
+        root: .
+        path: result.txt
+        phase: after
+        expect:
+          contains:
+            state: present
+            text: "expected contents\\n"
+""",
+    "sqlite": """    # Edit the database path, read-only query, columns, and rows together.
+    # ORDER BY makes row order explicit. Only these selected rows are checked.
+    observers:
+      - name: expected database rows
+        kind: sqlite
+        root: .
+        path: result.db
+        phase: after
+        query: SELECT id, value FROM results ORDER BY id
+        expect:
+          contains:
+            state: present
+            columns: [id, value]
+            rows: [[1, expected]]
+""",
+}
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -83,6 +116,12 @@ def _parser() -> argparse.ArgumentParser:
         description="Write an expectations-mode starter contract without replacing existing work.",
     )
     init_parser.add_argument("path", nargs="?", default="mcp-behavior.yaml", type=Path)
+    init_parser.add_argument(
+        "--template",
+        choices=tuple(STARTER_OBSERVERS),
+        default="file",
+        help="starter assertion: file (default), sqlite, or response only",
+    )
     init_parser.add_argument("--force", action="store_true", help="replace an existing file")
     init_parser.set_defaults(handler=_init)
 
@@ -182,7 +221,10 @@ def _init(arguments: argparse.Namespace) -> int:
     if path.exists() and not arguments.force:
         raise ValueError(f"refusing to replace existing file: {path}; pass --force to replace it")
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(STARTER_CONTRACT, encoding="utf-8", newline="\n")
+    starter = STARTER_CONTRACT + STARTER_OBSERVERS[arguments.template]
+    if arguments.template == "response":
+        starter = starter.replace(" succeeds and writes the expected state", " succeeds")
+    path.write_text(starter, encoding="utf-8", newline="\n")
     print(path)
     return 0
 

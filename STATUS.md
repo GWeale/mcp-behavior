@@ -6,11 +6,11 @@ Updated: 2026-10-20
 
 The reviewed alpha is public as [`GWeale/mcp-behavior`](https://github.com/GWeale/mcp-behavior). GitHub source installation and the composite Action are supported; no package, tag, GitHub Release, or announcement is approved.
 
-The first-run flow includes `mcp-behavior demo`, a concise README led by the invoice
-example, a generated raster header, and CLI documentation. The README's
-SVG logo and animated GIF have been replaced with static images.
-The demo executes the checks shown in the illustration without credentials or an
-existing MCP server. This is a source update, not a package or tagged release.
+The first-run flow includes the self-contained invoice demo, state-first starter
+templates, and a README led by a reproduced, fixed historical regression in the
+official filesystem server. A linked terminal replay, original captured output,
+and sanitized receipt accompany that case. The main header remains the README's
+sole illustration. This is a source update, not a package or tagged release.
 
 ## Completed
 
@@ -30,6 +30,15 @@ existing MCP server. This is a source update, not a package or tagged release.
 - Enabled secret scanning, push protection, vulnerability alerts, automated security updates, and private vulnerability reporting.
 
 ## Validation
+
+### State-first onboarding and real regression case: 2026-10-20
+
+- Reproduced upstream filesystem PR #5011 with published versions `2026.8.31` and `2.0.0`: identical successful tool content, LF bytes on the old version, preserved CRLF on the fixed version. Response-only, state-observed, and fixed-control checks produced `MATCH`, `DIVERGE`, `MATCH`; independent byte reads passed.
+- Added editable file (default), SQLite, and response-only starter templates. A public-interface regression check verifies that the file starter catches wrong contents after a successful call.
+- Added bounded expected/actual previews to terminal and Markdown reports without changing semantic evidence. Tests check escaped line endings, safe Markdown values, and complete JSON values.
+- Recorded actual stdout and original timing; rendered a labeled 24-second replay for sharing. The case credits the existing upstream fix and makes no discovery claim.
+- Added a separate Linux CI reproduction and expanded clean-wheel smoke coverage to all starter variants and the invoice demo.
+- Full Windows/Python 3.13.4 release gate passed: 84 tests, 87.05% coverage, Ruff, strict mypy, documentation links, provenance/secret audit, and no known audited dependency vulnerabilities. Both distribution archives verified. The clean wheel passed all ten example configurations, semantic-digest repeatability, three starter commands, and the invoice demo. A fresh-context review found no blocking issues. No runtime dependency was added.
 
 ### Static README refresh: 2026-10-20
 

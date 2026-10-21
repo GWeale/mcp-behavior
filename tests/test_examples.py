@@ -62,7 +62,7 @@ def test_unicode_file_and_tree_observations_are_stable(tmp_path: Path) -> None:
     ]
 
 
-@pytest.mark.parametrize("example", ["unicode-files"])
+@pytest.mark.parametrize("example", ["unicode-files", "binary-file"])
 def test_example_cleanup_works_without_site_packages(tmp_path: Path, example: str) -> None:
     result = subprocess.run(
         [sys.executable, "-S", str(EXAMPLES / example / "server.py"), "--cleanup"],

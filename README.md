@@ -11,11 +11,7 @@ Regression tests for MCP servers. Compare tool responses and declared state chan
 
 A tool returns `saved: true`, but writes **109** instead of the requested **100**. A response check passes. A file assertion catches the mismatch.
 
-<p align="center">
-  <img src="docs/assets/invoice-check.png" width="840" alt="An export_invoice call requests total 100. The response says saved: true, but invoice.json contains total 109. Comparing requested and stored totals produces DIVERGE.">
-</p>
-
-Illustration of the intentional [wrong-write fixture](examples/wrong-effect/). MCP Behavior checks the effects you declare; it does not discover every side effect.
+See the intentional [wrong-write fixture](examples/wrong-effect/). MCP Behavior checks the effects you declare; it does not discover every side effect.
 
 ## Try it
 

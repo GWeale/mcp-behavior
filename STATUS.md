@@ -7,7 +7,7 @@ Updated: 2026-10-20
 The reviewed alpha is public as [`GWeale/mcp-behavior`](https://github.com/GWeale/mcp-behavior). GitHub source installation and the composite Action are supported; no package, tag, GitHub Release, or announcement is approved.
 
 The first-run flow includes `mcp-behavior demo`, a concise README led by the invoice
-example, two generated raster illustrations, and CLI documentation. The README's
+example, a generated raster header, and CLI documentation. The README's
 SVG logo and animated GIF have been replaced with static images.
 The demo executes the checks shown in the illustration without credentials or an
 existing MCP server. This is a source update, not a package or tagged release.
@@ -32,6 +32,8 @@ existing MCP server. This is a source update, not a package or tagged release.
 ## Validation
 
 ### Static README refresh: 2026-10-20
+
+- Follow-up: removed the invoice diagram from the README at George's request; the main MCP Behavior header is the sole illustration. The diagram file remains archived.
 
 - Replaced the README's vector logo and animation with an original generated PNG header and invoice illustration. Removed the GIF; retained the MP4 as an archived asset.
 - Shortened the README to the problem, runnable demo, server setup, result meanings, and reference links. The exact demo output and scope limits remain visible.

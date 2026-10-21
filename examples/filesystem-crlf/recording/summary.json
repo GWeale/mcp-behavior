@@ -1,0 +1,43 @@
+{
+  "case": "official filesystem CRLF preservation",
+  "upstream_fix": "https://github.com/modelcontextprotocol/servers/pull/5011",
+  "expected_hex": "63 0d 0a 62 0d 0a",
+  "same_tool_content": true,
+  "independent_byte_checks": "passed",
+  "platform": "Windows",
+  "python_version": "3.13.4",
+  "node_version": "v24.4.1",
+  "tool_content": [
+    {
+      "type": "text",
+      "text": "```diff\nIndex: <workspace>\\crlf.txt\n===================================================================\n--- <workspace>\\crlf.txt\toriginal\n+++ <workspace>\\crlf.txt\tmodified\n@@ -1,2 +1,2 @@\n-a\n+c\n b\n```\n\n"
+    }
+  ],
+  "elapsed_seconds": 1.019,
+  "runs": [
+    {
+      "stage": "response-only",
+      "version": "2026.8.31",
+      "verdict": "MATCH",
+      "call_verdict": "MATCH",
+      "actual_hex": "63 0a 62 0a",
+      "server_entrypoint_sha256": "729dc8511e779e5cd6640851a74b25283e3af1ca3a7106722f993e864a1d9935"
+    },
+    {
+      "stage": "state-observed",
+      "version": "2026.8.31",
+      "verdict": "DIVERGE",
+      "call_verdict": "MATCH",
+      "actual_hex": "63 0a 62 0a",
+      "server_entrypoint_sha256": "729dc8511e779e5cd6640851a74b25283e3af1ca3a7106722f993e864a1d9935"
+    },
+    {
+      "stage": "fixed-control",
+      "version": "2.0.0",
+      "verdict": "MATCH",
+      "call_verdict": "MATCH",
+      "actual_hex": "63 0d 0a 62 0d 0a",
+      "server_entrypoint_sha256": "ed5efae0e3597236ba1f170ce8d903280c1f58b36dd7a7ad53891ed634c7e996"
+    }
+  ]
+}

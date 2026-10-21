@@ -45,6 +45,31 @@ informed the moving values and drawn paths. No third-party artwork or branding w
 
 The GIF was removed in favor of the static README images; the MP4 remains as an archived asset.
 
+### Filesystem terminal replay added 2026-10-20
+
+`assets/filesystem-crlf-demo.mp4` replays stdout captured while executing
+the [CRLF reproduction](../examples/filesystem-crlf/). The published official
+filesystem servers are `2026.8.31` and `2.0.0`. The underlying regression and fix
+are credited to Cliff Hall's upstream [PR #5011](https://github.com/modelcontextprotocol/servers/pull/5011).
+No upstream source code, branding, or artwork was copied into the project.
+
+The [original cast](../examples/filesystem-crlf/recording/demo.cast) retains the
+captured output timings. Its [transcript](../examples/filesystem-crlf/recording/transcript.txt)
+is reproduced verbatim in the video. The 24-second, 1280 x 800, 15 fps video uses
+editorial timing for readability, explicitly labeled as a slowed terminal replay;
+it is not a screen recording or a latency measurement. There is no generated
+execution output. Frames were rendered locally with installed Pillow and encoded
+with ffmpeg. System fonts were rendered into pixels, not redistributed.
+
+The checked-in [receipt](../examples/filesystem-crlf/recording/summary.json) records
+the independently read bytes, tool content equality, exact top-level versions,
+entrypoint hashes, and environment. Only its generated workspace path is replaced
+with `<workspace>` in the displayed tool diff. Full raw evidence stays in the
+ignored `.mcp-behavior` directory. npm resolves transitive dependencies at install
+time; the receipt does not claim a fully locked npm environment. These optional
+case-study servers are not Python runtime dependencies and are exercised by a
+separate CI job.
+
 ## Project name
 
 An exact-name check on 2026-08-11 found no `GWeale/mcp-behavior` repository on GitHub and no `mcp-behavior` project on PyPI. Package availability must be checked again before a package release.

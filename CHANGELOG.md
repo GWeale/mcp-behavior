@@ -4,6 +4,17 @@ This project follows [Semantic Versioning](https://semver.org/). Contract and ev
 
 ## [Unreleased]
 
+### Added
+
+- A reproducible, credited case of the official filesystem server's fixed CRLF regression, with published version pins, independent byte checks, and a recorded terminal demo.
+- File (default), SQLite, and response-only `init --template` starters.
+- Bounded expected/actual previews in terminal and Markdown reports; complete JSON evidence is preserved.
+
+### Changed
+
+- Plain `init` now includes a file-state assertion. Use `init --template response` for the previous response-only starter.
+- Clean-wheel smoke checks cover all starter templates and the executable invoice demo.
+
 ## [0.1.0] - Unreleased
 
 ### Added

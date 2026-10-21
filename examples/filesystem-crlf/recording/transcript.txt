@@ -1,0 +1,14 @@
+Official filesystem edit_file: a fixed historical regression
+Requested: replace a with c; preserve CRLF ("c\r\nb\r\n").
+Upstream fix: modelcontextprotocol/servers#5011
+
+MATCH        2026.8.31    response-only
+  tool: success; actual bytes: 63 0a 62 0a
+DIVERGE      2026.8.31    state-observed
+  tool: success; actual bytes: 63 0a 62 0a
+MATCH        2.0.0        fixed-control
+  tool: success; actual bytes: 63 0d 0a 62 0d 0a
+
+Same successful edit diff in all three runs. Different file bytes.
+MATCH -> DIVERGE -> MATCH; independent read_bytes() checks passed.
+A direct SDK test with the same byte assertion catches this too.

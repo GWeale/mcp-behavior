@@ -100,6 +100,8 @@ Each run saves inspectable evidence: observed values, field-level differences, d
 
 See the [CLI reference](docs/CLI.md) for recording, comparison options, and report formats.
 
+More examples: [binary files](examples/binary-file/), [Unicode filenames](examples/unicode-files/), and [expected tool errors](examples/expected-error/).
+
 ## Use in CI
 
 ```yaml
@@ -122,6 +124,7 @@ Configured servers, setup commands, and custom probes run as trusted local code.
 - [Contract reference](docs/CONTRACT.md) · [Observable effects](docs/EFFECTS.md) · [Normalization](docs/NORMALIZATION.md)
 - [CLI](docs/CLI.md) · [Python API](docs/API.md) · [Evidence](docs/EVIDENCE.md)
 - [CI setup](docs/CI.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Security](docs/SECURITY.md)
+- [Authenticated HTTP](docs/AUTHENTICATED_HTTP.md) · [External observers](docs/EXTENSIONS.md)
 - [Architecture](docs/ARCHITECTURE.md) · [Compatibility](docs/COMPATIBILITY.md) · [Related tools](docs/POSITIONING.md)
 - [Contributing](CONTRIBUTING.md) · [Roadmap](ROADMAP.md) · [Provenance](docs/PROVENANCE.md)
 

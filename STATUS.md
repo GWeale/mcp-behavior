@@ -30,6 +30,15 @@ existing MCP server. This is a source update, not a package or tagged release.
 
 ## Validation
 
+### Starter issue completion: 2026-10-20
+
+- All eight starter issues have associated merged PRs; see the [completion record](docs/CONTRIBUTOR_ISSUES.md) for their acceptance criteria and links.
+- Added Unicode file/tree coverage, generated binary comparisons, expected MCP error examples, and a credential-redaction-checked authenticated HTTP fixture.
+- Defined the Postgres observer and controlled repeat-run designs. The extension boundary is grounded in two working external probes; these proposals do not add a generic SDK, built-in Postgres observer, or repeat-run API.
+- The Docker prototype ran on Linux CI: startup 183 ms, successful verification and cleanup 1,542 ms, timeout and cleanup 6,113 ms. Both containers were confirmed removed. This remains a prototype, with the default runner unchanged.
+- Consolidated dependency updates, documented their justification, and fixed a process-cleanup race exposed during cross-platform CI. Each issue PR passed the Python 3.11–3.14 matrix on Linux, macOS, and Windows before merging into the integration branch.
+- The complete combined release gate passed on Windows with Python 3.12.14: 79 tests, 86.97% coverage, Ruff, strict mypy, documentation links, provenance/secret audit, and no known audited dependency vulnerabilities. Both distribution archives verified; the clean wheel passed all ten example configurations and the semantic-digest repeatability check. The separate repeat-summary design checks also passed.
+
 ### Local first-run checks: 2026-10-20
 
 - Pytest: 55 tests passed with 86.41% coverage on Windows with Python 3.12.14, including the new real
@@ -82,6 +91,6 @@ existing MCP server. This is a source update, not a package or tagged release.
 
 ## Next actions
 
-- Maintain the starter issues and use early adopter feedback to decide whether the contract and evidence formats are ready for a stable boundary.
+- Use early adopter feedback to prioritize future work and decide whether the contract and evidence formats are ready for a stable boundary. Follow the accepted designs when implementing repeat runs or a built-in Postgres observer.
 - Assign `docs/assets/social-preview.png` in the GitHub repository settings when a browser session is available.
 - Request separate approval before configuring PyPI, creating a tag or GitHub Release, or announcing the project.

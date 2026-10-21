@@ -11,6 +11,7 @@ from pathlib import Path
 
 from .contract import ContractError, load_contract
 from .core import record, verify
+from .demo import run_demo
 from .evidence import EvidenceError, digest_report_payload
 from .execution import ExecutionError
 from .models import JsonValue
@@ -63,6 +64,18 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--version", action="version", version="mcp-behavior 0.1.0")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    demo_parser = subparsers.add_parser(
+        "demo",
+        help="run an invoice regression without configuring a server",
+        description="Run a trusted local fixture through response-only, state, and fixed checks.",
+    )
+    demo_parser.add_argument(
+        "--evidence",
+        type=Path,
+        help="retain evidence in a new directory; existing paths are refused",
+    )
+    demo_parser.set_defaults(handler=_demo)
 
     init_parser = subparsers.add_parser(
         "init",
@@ -172,6 +185,10 @@ def _init(arguments: argparse.Namespace) -> int:
     path.write_text(STARTER_CONTRACT, encoding="utf-8", newline="\n")
     print(path)
     return 0
+
+
+def _demo(arguments: argparse.Namespace) -> int:
+    return run_demo(arguments.evidence)
 
 
 def _record(arguments: argparse.Namespace) -> int:

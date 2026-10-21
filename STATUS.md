@@ -1,10 +1,15 @@
 # Status
 
-Updated: 2026-08-11
+Updated: 2026-10-20
 
 ## Current phase
 
 The reviewed alpha is public as [`GWeale/mcp-behavior`](https://github.com/GWeale/mcp-behavior). GitHub source installation and the composite Action are supported; no package, tag, GitHub Release, or announcement is approved.
+
+The first-run flow includes `mcp-behavior demo`, a shorter README led by the invoice
+example, a 14-second explanatory animation in GIF and MP4, and CLI documentation.
+The demo executes the checks shown in the illustration without credentials or an
+existing MCP server. This is a source update, not a package or tagged release.
 
 ## Completed
 
@@ -24,6 +29,28 @@ The reviewed alpha is public as [`GWeale/mcp-behavior`](https://github.com/GWeal
 - Enabled secret scanning, push protection, vulnerability alerts, automated security updates, and private vulnerability reporting.
 
 ## Validation
+
+### Local first-run checks: 2026-10-20
+
+- Pytest: 55 tests passed with 86.41% coverage on Windows with Python 3.12.14, including the new real
+  demo/evidence-preservation regression test. Process tests ran outside the outer
+  execution sandbox because that sandbox interferes with child-process cleanup.
+- Ruff formatting and lint, strict mypy, local documentation links, and the existing
+  provenance/secret audit passed.
+- A local wheel built successfully, installed with the frozen runtime dependency set
+  into a separate environment, and passed dependency consistency checks.
+- Both the installed console command and module entry point ran the demo from an
+  unrelated directory with the expected call/effect verdicts and totals; the default
+  run left that invoking directory unchanged.
+- The README animation was visually inspected and matches the recorded fixture values.
+  It is labeled as an explanatory animation of an intentional regression fixture.
+- The README was shortened to a single first-run path, a minimal server example,
+  concise result/workflow tables, and links to the full references. Its GIF and MP4
+  are both 14 seconds; the GIF is 1080 x 675 and about 474 KB.
+- No runtime dependency was added. Linux/macOS and the full release-candidate gate
+  were not rerun for these local changes. No external user or audience test occurred.
+
+### Previous release-gate record: 2026-08-11
 
 - Complete release gate: passing on 2026-08-11.
 - Ruff format and lint: passing across 68 checked files.

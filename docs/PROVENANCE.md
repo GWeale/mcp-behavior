@@ -18,6 +18,25 @@ The [positioning note](POSITIONING.md) records where this project begins and whe
 
 The terminal demo is an original repository-native SVG asset. The current logo direction was selected from project-specific concepts made with OpenAI image generation, then independently reconstructed as tracked SVG paths for this repository. Its raster assets and social preview are rendered from those tracked vectors; no third-party branding was used.
 
+### Invoice animation added 2026-10-20
+
+`assets/behavior-demo.gif` and `assets/behavior-demo.mp4` are an original 14-second
+explanatory animation grounded in executed checks of the public
+[invoice fixture](../examples/wrong-effect/). The requested total is 100; the
+intentional bug writes 109 while returning `saved: true`. A declared file assertion
+catches the mismatch. Removing `+ 9` makes the same assertion pass.
+
+The values, expressions, and verdicts were checked against recorded manifests and
+the fixture source. The animation is labeled as an intentional fixture, not a screen
+recording or production incident. Its two branches show observable outcomes; the
+actual server writes the file before returning. Timing is editorial, not a latency
+measurement. A direct SDK test with the same assertion can detect this error too.
+
+The drawing and motion were authored locally with Pillow and encoded with ffmpeg.
+System fonts are rendered into pixels; font files are not redistributed. The
+[flow recipe](https://github.com/Vincentwei1021/video-shotcraft/blob/main/references/shots/ui-entrance/bezier-source-converge-merge.md)
+informed the moving values and drawn paths. No third-party artwork or branding was copied.
+
 ## Project name
 
 An exact-name check on 2026-08-11 found no `GWeale/mcp-behavior` repository on GitHub and no `mcp-behavior` project on PyPI. Package availability must be checked again before a package release.

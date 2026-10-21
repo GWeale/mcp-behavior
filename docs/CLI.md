@@ -6,6 +6,18 @@ mcp-behavior <command> [options]
 
 All commands return `2` for invalid configuration or execution uncertainty. Verification commands return `0` for `MATCH` and `1` for a verified `DIVERGE`.
 
+## `demo`
+
+Run a self-contained, intentional invoice regression fixture without credentials or an existing MCP server.
+
+```bash
+mcp-behavior demo [--evidence NEW_DIRECTORY]
+```
+
+The command executes three real checks: the broken server with response-only assertions (`MATCH`), the same implementation with a file-state assertion (`DIVERGE`), and a corrected implementation with both assertions (`MATCH`). It returns `0` only when that complete sequence is observed; an unexpected verdict or execution problem returns `2`. The expected middle divergence does not make a successful demo exit with `1`.
+
+Each stage uses a separate temporary workspace. By default, workspaces and evidence are removed when the command finishes. `--evidence` preserves the three reports in a new destination; existing paths are refused rather than overwritten. The retained reports describe an authored fixture, not production behavior. The bundled server runs as trusted local code and makes no model calls.
+
 ## `init`
 
 Write a strict expectations-mode starter contract.

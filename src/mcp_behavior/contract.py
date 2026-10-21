@@ -38,8 +38,7 @@ class ContractError(ValueError):
 
 class _StrictLoader(yaml.SafeLoader):
     def compose_node(self, parent: Any, index: Any) -> yaml.Node:
-        # PyYAML's published stubs omit these parser method signatures.
-        if self.check_event(yaml.AliasEvent):  # type: ignore[no-untyped-call]
+        if self.check_event(yaml.AliasEvent):
             event = self.get_event()  # type: ignore[no-untyped-call]
             raise ConstructorError(
                 None,

@@ -1,0 +1,33 @@
+name: Docker prototype
+
+on:
+  pull_request:
+    paths:
+      - prototypes/docker/**
+      - .github/workflows/docker-prototype.yml
+  push:
+    branches: [main]
+    paths:
+      - prototypes/docker/**
+      - .github/workflows/docker-prototype.yml
+
+permissions:
+  contents: read
+
+jobs:
+  docker-prototype:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --all-groups --locked
+      - run: docker build -t mcp-behavior-prototype:local -f prototypes/docker/Dockerfile .
+      - run: uv run python prototypes/docker/measure.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: docker-prototype-report
+          path: .mcp-behavior/docker-prototype/

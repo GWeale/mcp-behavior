@@ -1,6 +1,19 @@
-# Contributor issue drafts
+# Contributor issue completion record
 
-These issues are ready to open after the repository becomes public. Each one has a bounded result and an observable acceptance check.
+The eight starter issues are complete. The original acceptance criteria below remain as a record of their scope; design issues deliver reviewed specifications rather than unimplemented runtime features.
+
+| Issue | Deliverable | PR |
+|---|---|---|
+| [#6](https://github.com/GWeale/mcp-behavior/issues/6) | Unicode file and tree coverage | [#27](https://github.com/GWeale/mcp-behavior/pull/27) |
+| [#7](https://github.com/GWeale/mcp-behavior/issues/7) | Authenticated HTTP fixture and documentation | [#29](https://github.com/GWeale/mcp-behavior/pull/29) |
+| [#8](https://github.com/GWeale/mcp-behavior/issues/8) | Read-only Postgres observer specification | [#31](https://github.com/GWeale/mcp-behavior/pull/31) |
+| [#9](https://github.com/GWeale/mcp-behavior/issues/9) | Binary comparison example | [#33](https://github.com/GWeale/mcp-behavior/pull/33) |
+| [#10](https://github.com/GWeale/mcp-behavior/issues/10) | Expected tool error and broken connection examples | [#35](https://github.com/GWeale/mcp-behavior/pull/35) |
+| [#11](https://github.com/GWeale/mcp-behavior/issues/11) | Measured Docker prototype | [#28](https://github.com/GWeale/mcp-behavior/pull/28) |
+| [#12](https://github.com/GWeale/mcp-behavior/issues/12) | Controlled repeat-run ADR and summary model | [#26](https://github.com/GWeale/mcp-behavior/pull/26) |
+| [#13](https://github.com/GWeale/mcp-behavior/issues/13) | Extension boundary grounded in two working probes | [#34](https://github.com/GWeale/mcp-behavior/pull/34) |
+
+Dependency updates were consolidated in [#30](https://github.com/GWeale/mcp-behavior/pull/30). A process-cleanup race found during cross-platform validation was fixed in [#32](https://github.com/GWeale/mcp-behavior/pull/32).
 
 ## 1. Add a binary file comparison example
 

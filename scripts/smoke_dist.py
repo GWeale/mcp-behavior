@@ -11,11 +11,16 @@ import tempfile
 from pathlib import Path
 
 EXAMPLES = (
-    ("expectations", "verify", 0),
-    ("baseline", "verify", 0),
-    ("differential", "diff", 1),
-    ("wrong-effect", "verify", 1),
-    ("nondeterminism", "verify", 2),
+    ("expectations", "verify", "mcp-behavior.yaml", 0),
+    ("baseline", "verify", "mcp-behavior.yaml", 0),
+    ("differential", "diff", "mcp-behavior.yaml", 1),
+    ("wrong-effect", "verify", "mcp-behavior.yaml", 1),
+    ("nondeterminism", "verify", "mcp-behavior.yaml", 2),
+    ("unicode-files", "verify", "mcp-behavior.yaml", 0),
+    ("binary-file", "verify", "mcp-behavior.yaml", 0),
+    ("binary-file", "verify", "wrong-byte.yaml", 1),
+    ("expected-error", "verify", "mcp-behavior.yaml", 0),
+    ("expected-error", "verify", "broken-connection.yaml", 2),
 )
 
 
@@ -59,14 +64,14 @@ def main() -> int:
                 quiet=arguments.quiet,
             )
 
-        for name, command, expected in EXAMPLES:
+        for name, command, contract, expected in EXAMPLES:
             example = root / "examples" / name
-            evidence = smoke_root / "evidence" / name
+            evidence = smoke_root / "evidence" / name / Path(contract).stem
             _run_expected(
                 [
                     str(cli),
                     command,
-                    "mcp-behavior.yaml",
+                    contract,
                     "--evidence",
                     str(evidence),
                     "--diff-detail",

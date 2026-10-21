@@ -1,0 +1,26 @@
+version: 1
+name: expected-error-example
+
+targets:
+  candidate:
+    transport: stdio
+    command: [python, server.py]
+    workspace: .
+
+scenarios:
+  - name: known item succeeds and unknown item returns a tool error
+    calls:
+      - name: known item
+        tool: lookup_item
+        arguments:
+          item_id: known
+        expect:
+          outcome: success
+          paths_equal:
+            $.structuredContent.id: known
+      - name: unknown item
+        tool: lookup_item
+        arguments:
+          item_id: missing
+        expect:
+          outcome: error

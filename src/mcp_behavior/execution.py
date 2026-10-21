@@ -16,6 +16,8 @@ from typing import Any
 from .contract import CommandSpec
 from .models import JsonValue
 
+_PROCESS_EXIT_TIMEOUT = 5.0
+
 
 class ExecutionError(RuntimeError):
     pass
@@ -164,10 +166,27 @@ async def _kill_process_tree(process: asyncio.subprocess.Process) -> None:
         )
         await killer.wait()
     else:
-        with suppress(ProcessLookupError):
+        try:
             os.kill(-process.pid, getattr(signal, "SIGKILL", 9))
+        except ProcessLookupError:
+            pass
+        except PermissionError:
+            # A short-lived child can exit before asyncio observes its status.
+            # Only forgive a denied signal once both its exit and the absence
+            # of the entire group are confirmed; descendants may outlive it.
+            with suppress(TimeoutError):
+                await asyncio.wait_for(process.wait(), timeout=_PROCESS_EXIT_TIMEOUT)
+            if process.returncode is None:
+                raise
+            try:
+                os.kill(-process.pid, 0)
+            except ProcessLookupError:
+                return
+            except PermissionError:
+                pass
+            raise
     try:
-        await asyncio.wait_for(process.wait(), timeout=5)
+        await asyncio.wait_for(process.wait(), timeout=_PROCESS_EXIT_TIMEOUT)
     except TimeoutError:
         process.kill()
         await process.wait()

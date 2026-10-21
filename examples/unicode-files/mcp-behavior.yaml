@@ -1,0 +1,42 @@
+version: 1
+name: unicode-files-example
+
+targets:
+  candidate:
+    transport: stdio
+    command: [python, server.py]
+    workspace: .
+
+scenarios:
+  - name: Unicode file contents and mixed filename ordering
+    setup:
+      - command: [python, server.py, --cleanup]
+    calls:
+      - tool: write_files
+        expect:
+          outcome: success
+          paths_equal:
+            $.structuredContent.written: 5
+    observers:
+      - name: UTF-8 file
+        kind: file
+        root: unicode-files
+        path: café-猫.txt
+        expect:
+          contains:
+            state: present
+            encoding: utf-8
+            text: "Hello, 世界!\n"
+      - name: mixed filename tree
+        kind: tree
+        root: unicode-files
+        expect:
+          paths_equal:
+            $.state: present
+            $.entries[0].path: A.txt
+            $.entries[2].path: z.txt
+            $.entries[3].path: π.txt
+            $.entries[4].path: 猫.txt
+          paths_absent: ["$.entries[5]"]
+    cleanup:
+      - command: [python, server.py, --cleanup]

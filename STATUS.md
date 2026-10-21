@@ -4,13 +4,14 @@ Updated: 2026-10-20
 
 ## Current phase
 
-The reviewed alpha is public as [`GWeale/mcp-behavior`](https://github.com/GWeale/mcp-behavior). GitHub source installation and the composite Action are supported; no package, tag, GitHub Release, or announcement is approved.
+The reviewed alpha is public as [`GWeale/mcp-behavior`](https://github.com/GWeale/mcp-behavior). George approved merging PR #39 and creating the first versioned GitHub alpha, `v0.1.0`, on 2026-10-20. The release candidate includes installable packages and demo evidence. PyPI publication remains an explicit opt-in; no announcement is included.
 
 The first-run flow includes the self-contained invoice demo, state-first starter
 templates, and a README led by a reproduced, fixed historical regression in the
 official filesystem server. A linked terminal replay, original captured output,
 and sanitized receipt accompany that case. The main header remains the README's
-sole illustration. This is a source update, not a package or tagged release.
+sole illustration. The first GitHub release uses the same `0.1.0` package version
+already present in source; no earlier version was published.
 
 ## Completed
 
@@ -30,6 +31,12 @@ sole illustration. This is a source update, not a package or tagged release.
 - Enabled secret scanning, push protection, vulnerability alerts, automated security updates, and private vulnerability reporting.
 
 ## Validation
+
+### First versioned alpha candidate: 2026-10-20
+
+- PR #39 merged at `2177b6ee77574e88fbc4b4da5016b30201713a10` after all 15 CI checks passed.
+- Prepared current release notes and a dated changelog, and pinned README install commands to `v0.1.0`.
+- Separated GitHub release publication from opt-in PyPI publishing because no `pypi` environment is configured. Added tag/package-version validation and demo attachments; alpha releases are marked as GitHub prereleases.
 
 ### State-first onboarding and real regression case: 2026-10-20
 

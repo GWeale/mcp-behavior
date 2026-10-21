@@ -24,13 +24,13 @@ Confirm the README logo, demo, badges, install command, examples, security bound
 
 ## Release plumbing
 
-- GitHub-only source publication was approved on 2026-08-11. PyPI publishing, tags, and GitHub Releases require separate approval.
-- Configure a PyPI trusted publisher for `.github/workflows/release.yml`, environment `pypi`.
+- George approved merging PR #39 and creating the first versioned GitHub alpha on 2026-10-20. PyPI publishing is separately controlled by the opt-in release configuration.
+- For PyPI publication, configure a trusted publisher for `.github/workflows/release.yml`, environment `pypi`, require environment approval, and explicitly set `PUBLISH_PYPI=true`. This is not required for GitHub-only artifacts.
 - Push the reviewed `main` commit and wait for every CI job to pass.
 - Confirm all twelve operating-system and Python matrix jobs pass.
 - Run the composite action from a separate test repository before declaring it stable.
-- Create a signed or annotated `v0.1.0` tag only after the repository and publisher settings are confirmed.
-- Verify the GitHub Release, PyPI metadata, checksums, and clean-environment install using [the release process](RELEASING.md).
+- Create a signed or annotated `v0.1.0` tag after the candidate CI passes. Confirm publisher settings separately if PyPI is enabled.
+- Verify the GitHub Release, package checksums, and clean-environment install using [the release process](RELEASING.md). Verify PyPI metadata only when that publication was enabled.
 
 ## First public issue set
 

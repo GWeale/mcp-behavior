@@ -4,21 +4,14 @@ This project follows [Semantic Versioning](https://semver.org/). Contract and ev
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-20
+
 ### Added
 
 - A reproducible, credited case of the official filesystem server's fixed CRLF regression, with published version pins, independent byte checks, and a recorded terminal demo.
 - File (default), SQLite, and response-only `init --template` starters.
 - Bounded expected/actual previews in terminal and Markdown reports; complete JSON evidence is preserved.
-
-### Changed
-
-- Plain `init` now includes a file-state assertion. Use `init --template response` for the previous response-only starter.
-- Clean-wheel smoke checks cover all starter templates and the executable invoice demo.
-
-## [0.1.0] - Unreleased
-
-### Added
-
+- The self-contained invoice `demo` command and retained evidence option.
 - Expectations, recorded-baseline, and live differential verification.
 - Official MCP SDK adapters for stdio and Streamable HTTP targets.
 - Strict version 1 YAML contracts with literal variables, names, tags, lifecycle commands, explicit normalization, assertions, and comparison controls.
@@ -29,6 +22,12 @@ This project follows [Semantic Versioning](https://semver.org/). Contract and ev
 - `init`, `record`, `verify`, `diff`, and `inspect` CLI commands.
 - Composite GitHub Action and five runnable example suites covering expectations, baselines, value drift, incorrect effects, normalization, and uncertainty.
 - Linux, macOS, and Windows CI across Python 3.11 through 3.14.
+
+### Changed
+
+- Plain `init` now includes a file-state assertion. Use `init --template response` for the previous response-only starter.
+- Clean-wheel smoke checks cover all starter templates and the executable invoice demo.
+- Tagged alpha releases publish installable GitHub artifacts independently of optional PyPI trusted publishing.
 
 [Unreleased]: https://github.com/GWeale/mcp-behavior/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/GWeale/mcp-behavior/releases/tag/v0.1.0

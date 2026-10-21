@@ -28,7 +28,7 @@ A direct SDK test with the same file assertion catches this too. MCP Behavior gi
 Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+. No API key or existing server needed.
 
 ```bash
-uvx --from git+https://github.com/GWeale/mcp-behavior.git mcp-behavior demo
+uvx --from git+https://github.com/GWeale/mcp-behavior.git@v0.1.0 mcp-behavior demo
 ```
 
 This separate, intentional invoice fixture runs three real checks and removes its temporary files. It writes 109 while returning `saved: true` for a requested total of 100:
@@ -42,7 +42,7 @@ MATCH        corrected implementation: file total = 100
 ## Test your server
 
 ```bash
-uv tool install git+https://github.com/GWeale/mcp-behavior.git
+uv tool install git+https://github.com/GWeale/mcp-behavior.git@v0.1.0
 mcp-behavior init
 ```
 
@@ -68,4 +68,4 @@ Found a response that hides a wrong state change? [Open a minimal, sanitized cas
 
 [CLI](docs/CLI.md) · [Python API](docs/API.md) · [Evidence](docs/EVIDENCE.md) · [Examples](examples/) · [Authenticated HTTP](docs/AUTHENTICATED_HTTP.md) · [Contributing](CONTRIBUTING.md)
 
-Alpha: install from GitHub and pin a commit for reproducible use. Backward compatibility starts with the first versioned release. Configured servers and probes run as trusted code; see [security](docs/SECURITY.md). No telemetry or model calls.
+Alpha: install from the pinned GitHub tag or download a wheel from [v0.1.0](https://github.com/GWeale/mcp-behavior/releases/tag/v0.1.0). See [compatibility](docs/COMPATIBILITY.md) for schema guarantees. Configured servers and probes run as trusted code; see [security](docs/SECURITY.md). No telemetry or model calls.

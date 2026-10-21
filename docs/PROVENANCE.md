@@ -16,11 +16,17 @@ The product boundary was informed by public behavior-testing concepts and these 
 
 The [positioning note](POSITIONING.md) records where this project begins and where those tools remain the better fit.
 
-The terminal demo is an original repository-native SVG asset. The current logo direction was selected from project-specific concepts made with OpenAI image generation, then independently reconstructed as tracked SVG paths for this repository. Its raster assets and social preview are rendered from those tracked vectors; no third-party branding was used.
+The earlier terminal demo and signal-logo assets remain in the repository as legacy artwork. The signal logo was selected from project-specific concepts made with OpenAI image generation, then independently reconstructed as tracked SVG paths. Its small raster variants and social preview were rendered from those vectors; no third-party branding was used.
+
+### Static README images added 2026-10-20
+
+`assets/readme-header.png` and `assets/invoice-check.png` were generated with OpenAI's built-in image generation tool and copied unchanged into this repository. They are original project-specific raster artwork, not SVG renders or screenshots.
+
+The header uses printed registration traces as a metaphor for comparing behavior. The invoice illustration shows the public intentional fixture's exact request (100), successful response (`saved: true`), incorrect file total (109), and `DIVERGE` result. It illustrates observations, not execution order or measured performance. The executable demo remains the evidence for those outcomes.
 
 ### Invoice animation added 2026-10-20
 
-`assets/behavior-demo.gif` and `assets/behavior-demo.mp4` are an original 14-second
+The former `behavior-demo.gif` and retained `assets/behavior-demo.mp4` were an original 14-second
 explanatory animation grounded in executed checks of the public
 [invoice fixture](../examples/wrong-effect/). The requested total is 100; the
 intentional bug writes 109 while returning `saved: true`. A declared file assertion
@@ -36,6 +42,8 @@ The drawing and motion were authored locally with Pillow and encoded with ffmpeg
 System fonts are rendered into pixels; font files are not redistributed. The
 [flow recipe](https://github.com/Vincentwei1021/video-shotcraft/blob/main/references/shots/ui-entrance/bezier-source-converge-merge.md)
 informed the moving values and drawn paths. No third-party artwork or branding was copied.
+
+The GIF was removed in favor of the static README images; the MP4 remains as an archived asset.
 
 ## Project name
 

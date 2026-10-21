@@ -1,37 +1,31 @@
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
-    <img src="docs/assets/logo.svg" width="100" alt="MCP Behavior logo">
-  </picture>
-  <h1>MCP Behavior</h1>
-  <p>Test what an MCP tool returns and what it changes.</p>
+<p align="center">
+  <img src="docs/assets/readme-header.png" width="960" alt="MCP Behavior — Test the response. Check the change.">
+</p>
 
-  [![CI](https://github.com/GWeale/mcp-behavior/actions/workflows/ci.yml/badge.svg)](https://github.com/GWeale/mcp-behavior/actions/workflows/ci.yml)
-  [![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg)](https://www.python.org/downloads/)
-  [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-</div>
+[![CI](https://github.com/GWeale/mcp-behavior/actions/workflows/ci.yml/badge.svg)](https://github.com/GWeale/mcp-behavior/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-Check an MCP server rewrite by comparing responses and declared state changes. Run against another server, a saved baseline, or YAML expectations.
+Regression tests for MCP servers. Compare tool responses and declared state changes against another server, a saved baseline, or YAML expectations.
 
 ## A successful response can hide a wrong write
 
-This example requests an invoice total of **100**. The tool returns `saved: true`, but writes **109**. A response-only check passes; checking the invoice file catches the error.
+A tool returns `saved: true`, but writes **109** instead of the requested **100**. A response check passes. A file assertion catches the mismatch.
 
 <p align="center">
-  <img src="docs/assets/behavior-demo.gif" width="960" alt="One request produces a successful response and an invoice with the wrong total. A declared file check catches the mismatch; removing the extra 9 makes the same check pass.">
+  <img src="docs/assets/invoice-check.png" width="840" alt="An export_invoice call requests total 100. The response says saved: true, but invoice.json contains total 109. Comparing requested and stored totals produces DIVERGE.">
 </p>
 
-14-second explanatory animation of an intentional fixture. [Watch the MP4](docs/assets/behavior-demo.mp4) · [See the example](examples/wrong-effect/).
+Illustration of the intentional [wrong-write fixture](examples/wrong-effect/). MCP Behavior checks the effects you declare; it does not discover every side effect.
 
-## Try the demo
+## Try it
 
-Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+. No API key or existing MCP server needed.
+Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+. No API key or existing server needed.
 
 ```bash
 uvx --from git+https://github.com/GWeale/mcp-behavior.git mcp-behavior demo
 ```
 
-The command runs three real checks:
+The demo runs three real checks and removes its temporary files:
 
 ```text
 MATCH        response only: file total = 109
@@ -39,93 +33,31 @@ DIVERGE      response + file state: file total = 109
 MATCH        corrected implementation: file total = 100
 ```
 
-It exits successfully only when all three expected results occur, then removes its temporary files. To keep the reports, use `mcp-behavior demo --evidence demo-evidence` with a new directory.
-
-## Check your own server
-
-Install the current alpha from GitHub and create a starter contract:
+## Test your server
 
 ```bash
-pipx install git+https://github.com/GWeale/mcp-behavior.git
+uv tool install git+https://github.com/GWeale/mcp-behavior.git
 mcp-behavior init
 ```
 
-Edit `mcp-behavior.yaml` to point at your server and describe a call:
-
-```yaml
-version: 1
-name: inventory-server
-
-targets:
-  candidate:
-    transport: stdio
-    command: [python, server.py]
-    workspace: .mcp-behavior/workspace
-
-scenarios:
-  - name: lookup returns the requested item
-    calls:
-      - tool: lookup
-        arguments:
-          item_id: item-42
-        expect:
-          outcome: success
-          paths_equal:
-            $.structuredContent.id: item-42
-```
-
-Then run:
+Edit `mcp-behavior.yaml` with your server command, calls, and assertions, then run:
 
 ```bash
 mcp-behavior verify mcp-behavior.yaml
 ```
 
-Add explicit [observers](docs/EFFECTS.md) to check files, directory trees, SQLite data, or a trusted custom probe. The [wrong-write example](examples/wrong-effect/mcp-behavior.yaml) shows a complete file assertion.
+Add [observers](docs/EFFECTS.md) for files, directory trees, SQLite, or a custom probe. Start from the [complete example](examples/expectations/) or the [contract reference](docs/CONTRACT.md).
 
-## Results and workflows
-
-| Result | Meaning | Exit code |
+| Result | Meaning | Exit |
 |---|---|---:|
 | `MATCH` | The selected checks agree. | 0 |
-| `DIVERGE` | A result or declared effect differs. | 1 |
+| `DIVERGE` | A response or declared effect differs. | 1 |
 | `INCONCLUSIVE` | The run could not establish a result. | 2 |
 
-Each run saves inspectable evidence: observed values, field-level differences, declared effects, and bounded logs. JSON, Markdown, and JUnit output are available.
+Each run saves evidence and differences. Export reports as JSON, Markdown, or JUnit, or use the [GitHub Action](docs/CI.md) in CI.
 
-| Workflow | Compare against | Example |
-|---|---|---|
-| Differential | Another live server | [Changed response value](examples/differential/) |
-| Baseline | A reviewed JSON recording | [Recorded baseline](examples/baseline/) |
-| Expectations | Assertions in YAML | [Call and file assertions](examples/expectations/) |
+## Reference
 
-See the [CLI reference](docs/CLI.md) for recording, comparison options, and report formats.
+[CLI](docs/CLI.md) · [Python API](docs/API.md) · [Evidence](docs/EVIDENCE.md) · [Examples](examples/) · [Authenticated HTTP](docs/AUTHENTICATED_HTTP.md) · [Contributing](CONTRIBUTING.md)
 
-More examples: [binary files](examples/binary-file/), [Unicode filenames](examples/unicode-files/), and [expected tool errors](examples/expected-error/).
-
-## Use in CI
-
-```yaml
-- uses: GWeale/mcp-behavior@main
-  with:
-    contract: mcp-behavior.yaml
-    report: .mcp-behavior/report.xml
-```
-
-`main` is the alpha channel. Pin a commit SHA for an immutable version. See the [CI guide](docs/CI.md) for a complete workflow and evidence uploads.
-
-## Scope
-
-MCP Behavior focuses on regression checks during server migrations. It checks the responses and effects you declare; it does not discover every side effect. An ordinary SDK test with the same assertions can catch the same errors. This project packages those checks, comparisons, and evidence into reusable scenarios.
-
-Configured servers, setup commands, and custom probes run as trusted local code. Run untrusted servers in a container, VM, or another suitable sandbox. MCP Behavior has no telemetry or model calls.
-
-## Documentation
-
-- [Contract reference](docs/CONTRACT.md) · [Observable effects](docs/EFFECTS.md) · [Normalization](docs/NORMALIZATION.md)
-- [CLI](docs/CLI.md) · [Python API](docs/API.md) · [Evidence](docs/EVIDENCE.md)
-- [CI setup](docs/CI.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Security](docs/SECURITY.md)
-- [Authenticated HTTP](docs/AUTHENTICATED_HTTP.md) · [External observers](docs/EXTENSIONS.md)
-- [Architecture](docs/ARCHITECTURE.md) · [Compatibility](docs/COMPATIBILITY.md) · [Related tools](docs/POSITIONING.md)
-- [Contributing](CONTRIBUTING.md) · [Roadmap](ROADMAP.md) · [Provenance](docs/PROVENANCE.md)
-
-This project is an alpha. Backward compatibility starts with the first versioned release.
+Alpha: install from GitHub and pin a commit for reproducible use. Backward compatibility starts with the first versioned release. Configured servers and probes run as trusted code; see [security](docs/SECURITY.md). No telemetry or model calls.

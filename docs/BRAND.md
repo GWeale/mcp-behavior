@@ -1,6 +1,17 @@
 # Brand assets
 
-The MCP Behavior mark is a continuous signal between two endpoints. The navy-to-blue-to-mint path represents one declared scenario moving across implementations while preserving its returned value and observable effects.
+The README uses a raster wordmark with printed registration traces: a reference line and an observed line that diverges. Its companion invoice illustration explains the response/state mismatch with the same paper, ink, and red-accent treatment.
+
+Both PNGs were generated specifically for the project with OpenAI image generation. Keep the complete compositions and their text legible. See [provenance](PROVENANCE.md) for the distinction between artwork and executable evidence.
+
+| Current README asset | Use |
+|---|---|
+| `assets/readme-header.png` | project title and comparison motif |
+| `assets/invoice-check.png` | static illustration of the intentional wrong-write fixture |
+
+## Legacy signal assets
+
+The earlier mark is a continuous signal between two endpoints. Its navy-to-blue-to-mint path represents one declared scenario moving across implementations while preserving its returned value and observable effects. These assets remain available but are no longer used by the README.
 
 ## Files
 
@@ -28,4 +39,4 @@ The MCP Behavior mark is a continuous signal between two endpoints. The navy-to-
 
 Keep the mark upright, preserve clear space of at least one endpoint width, and use the dark variant whenever the navy endpoint loses contrast. Do not place the mark inside an additional rounded-square app tile, redraw the signal, or recolor individual sections independently.
 
-The SVG files are the canonical production assets. The raster master records the selected generated direction; the smaller PNGs are deterministic renders of the tracked vectors.
+For the legacy signal mark, SVG files preserve the editable source. Its raster master records the earlier generated direction; its smaller PNGs are deterministic renders of those tracked vectors. The current README images are independent raster originals.

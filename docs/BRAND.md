@@ -1,13 +1,13 @@
 # Brand assets
 
-The README uses a raster wordmark with printed registration traces: a reference line and an observed line that diverges. Its companion invoice illustration explains the response/state mismatch with the same paper, ink, and red-accent treatment.
+The README uses a raster wordmark with printed registration traces: a reference line and an observed line that diverges. The earlier companion invoice illustration is archived and no longer displayed in the README.
 
 Both PNGs were generated specifically for the project with OpenAI image generation. Keep the complete compositions and their text legible. See [provenance](PROVENANCE.md) for the distinction between artwork and executable evidence.
 
 | Current README asset | Use |
 |---|---|
 | `assets/readme-header.png` | project title and comparison motif |
-| `assets/invoice-check.png` | static illustration of the intentional wrong-write fixture |
+| `assets/invoice-check.png` | archived invoice illustration; not displayed in the README |
 
 ## Legacy signal assets
 

@@ -1,0 +1,33 @@
+version: 1
+name: binary-file-example
+
+targets:
+  candidate:
+    transport: stdio
+    command: [python, server.py]
+    workspace: .
+
+scenarios:
+  - name: generated binary bytes match
+    calls:
+      - tool: write_binary
+        arguments:
+          changed: false
+        expect:
+          outcome: success
+          paths_equal:
+            $.structuredContent.written: true
+            $.structuredContent.bytes: 18
+    observers:
+      - name: binary output
+        kind: file
+        root: .
+        path: generated.bin
+        compare:
+          kind: bytes
+        expect:
+          equals:
+            encoding: base64
+            data: AAECAwQFBgcICQoLDA0OD/+A
+    cleanup:
+      - command: [python, server.py, --cleanup]

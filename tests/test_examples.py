@@ -62,7 +62,7 @@ def test_unicode_file_and_tree_observations_are_stable(tmp_path: Path) -> None:
     ]
 
 
-@pytest.mark.parametrize("example", ["unicode-files"])
+@pytest.mark.parametrize("example", ["unicode-files", "binary-file"])
 def test_example_cleanup_works_without_site_packages(tmp_path: Path, example: str) -> None:
     result = subprocess.run(
         [sys.executable, "-S", str(EXAMPLES / example / "server.py"), "--cleanup"],
@@ -73,3 +73,22 @@ def test_example_cleanup_works_without_site_packages(tmp_path: Path, example: st
         timeout=5,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_binary_example_matches_and_reports_the_first_changed_byte(tmp_path: Path) -> None:
+    matching = _example_contract(tmp_path / "matching", "binary-file")
+    wrong = _example_contract(tmp_path / "wrong", "binary-file", "wrong-byte.yaml")
+    good_report = verify(matching, tmp_path / "matching-evidence")
+    wrong_report = verify(wrong, tmp_path / "wrong-evidence")
+    assert good_report.verdict is Verdict.MATCH
+    assert good_report.exit_code == 0
+    assert wrong_report.verdict is Verdict.DIVERGE
+    assert wrong_report.exit_code == 1
+    assert wrong_report.scenarios[0].calls[0].verdict is Verdict.MATCH
+    effect = wrong_report.scenarios[0].effects[0]
+    assert effect.verdict is Verdict.DIVERGE
+    assert len(effect.differences) == 1
+    assert effect.differences[0].path == "$[byte:7]"
+    assert effect.differences[0].message == "bytes differ at offset 7"
+    assert effect.differences[0].reference.startswith("07")
+    assert effect.differences[0].candidate.startswith("08")

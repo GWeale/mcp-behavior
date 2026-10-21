@@ -19,6 +19,8 @@ EXAMPLES = (
     ("unicode-files", "verify", "mcp-behavior.yaml", 0),
     ("binary-file", "verify", "mcp-behavior.yaml", 0),
     ("binary-file", "verify", "wrong-byte.yaml", 1),
+    ("expected-error", "verify", "mcp-behavior.yaml", 0),
+    ("expected-error", "verify", "broken-connection.yaml", 2),
 )
 
 

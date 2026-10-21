@@ -92,3 +92,21 @@ def test_binary_example_matches_and_reports_the_first_changed_byte(tmp_path: Pat
     assert effect.differences[0].message == "bytes differ at offset 7"
     assert effect.differences[0].reference.startswith("07")
     assert effect.differences[0].candidate.startswith("08")
+
+
+def test_expected_tool_error_matches_but_broken_connection_is_inconclusive(tmp_path: Path) -> None:
+    expected = _example_contract(tmp_path / "expected", "expected-error")
+    broken = _example_contract(tmp_path / "broken", "expected-error", "broken-connection.yaml")
+    expected_report = verify(expected, tmp_path / "expected-evidence")
+    broken_report = verify(broken, tmp_path / "broken-evidence")
+    assert expected_report.verdict is Verdict.MATCH
+    assert expected_report.exit_code == 0
+    calls = expected_report.scenarios[0].calls
+    assert [call.verdict for call in calls] == [Verdict.MATCH, Verdict.MATCH]
+    error_result = calls[1].candidate
+    assert isinstance(error_result, dict)
+    assert error_result["isError"] is True
+    assert "unknown item: missing" in str(error_result["content"])
+    assert broken_report.verdict is Verdict.INCONCLUSIVE
+    assert broken_report.exit_code == 2
+    assert broken_report.scenarios[0].error is not None
